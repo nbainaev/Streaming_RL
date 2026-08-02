@@ -1,0 +1,13 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_battleship_bench/popgym_battleship_ppo_gru/popgym_battleship_ppo_gru__env_id-popgym-BattleshipEasy__51c87d6dba__56b16783/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_battleship_bench/popgym_battleship_ppo_gru/popgym_battleship_ppo_gru__env_id-popgym-BattleshipEasy__51c87d6dba__56b16783/env.yaml
+scenario_config: null
+experiment_name: popgym_battleship_ppo_gru
+log_root: logs/popgym_bench
+total_timesteps: 170000
+log_every: 5000
+step_chunk: 1000
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1
+variant_name: popgym_battleship_ppo_gru__env_id=popgym-BattleshipEasy
+run_id: popgym_battleship_ppo_gru__env_id-popgym-BattleshipEasy__51c87d6dba__56b16783

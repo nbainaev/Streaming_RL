@@ -13,7 +13,7 @@
 # (gamma*lambda=0.9405 vs. the old 0.891) costs little and gives longer
 # credit reach without the higher-variance cost of pushing all the way to
 # Autoencode's 0.98.
-max_parallel: 4
+max_parallel: 1
 schedule: parallel
 work_dir: .exp_runner_popgym_battleship_bench
 

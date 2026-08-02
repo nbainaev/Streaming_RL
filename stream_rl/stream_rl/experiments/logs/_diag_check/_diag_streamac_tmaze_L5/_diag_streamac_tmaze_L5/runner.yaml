@@ -1,0 +1,10 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/agents/_diag_stream_ac_gru_tmaze.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/envs/_diag_tmaze_L5.yaml
+experiment_name: _diag_streamac_tmaze_L5
+log_root: logs/_diag_check
+total_timesteps: 49000
+log_every: 1000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

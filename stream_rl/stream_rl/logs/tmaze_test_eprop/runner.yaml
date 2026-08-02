@@ -1,0 +1,9 @@
+agent_config: C:\Users\nikba\.vscode\Projects\streaming_rl\stream_rl\stream_rl\experiments\configs\agents\eprop_stream_ac.yaml
+env_config: C:\Users\nikba\.vscode\Projects\streaming_rl\stream_rl\stream_rl\experiments\configs\envs\tmaze_passive_small.yaml
+experiment_name: tmaze_test_eprop
+log_root: logs/test_verification
+total_timesteps: 20000
+log_every: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

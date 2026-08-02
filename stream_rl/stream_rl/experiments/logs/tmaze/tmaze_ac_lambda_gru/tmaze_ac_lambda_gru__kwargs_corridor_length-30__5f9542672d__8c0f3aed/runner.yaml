@@ -1,0 +1,12 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner/tmaze_ac_lambda_gru/tmaze_ac_lambda_gru__kwargs_corridor_length-30__5f9542672d__8c0f3aed/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner/tmaze_ac_lambda_gru/tmaze_ac_lambda_gru__kwargs_corridor_length-30__5f9542672d__8c0f3aed/env.yaml
+scenario_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/scenario/tmaze_freeze.yaml
+experiment_name: tmaze_ac_lambda_gru
+log_root: logs/tmaze
+total_timesteps: 7000
+log_every: 100
+checkpoint_every: 1500
+eval_every: -1
+eval_steps: -1
+variant_name: tmaze_ac_lambda_gru__kwargs_corridor_length=30
+run_id: tmaze_ac_lambda_gru__kwargs_corridor_length-30__5f9542672d__8c0f3aed

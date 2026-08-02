@@ -1,0 +1,57 @@
+{
+  "env_config": {
+    "namespace": "popgym",
+    "env_id": "popgym-PositionOnlyCartPoleEasy",
+    "kwargs": {}
+  },
+  "agent_config": {
+    "name": "ppo",
+    "embed_dim": 64,
+    "num_envs": 16,
+    "num_steps": 128,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "num_minibatches": 4,
+    "update_epochs": 4,
+    "normalize_advantage": true,
+    "clip_coefficient": 0.2,
+    "clip_value_loss": true,
+    "entropy_coefficient": 0.01,
+    "actor_lr": 0.0003,
+    "critic_lr": 0.0003,
+    "max_grad_norm": 0.5,
+    "actor_architecture": [
+      {
+        "type": "fc",
+        "features": 64,
+        "activation": "tanh"
+      },
+      {
+        "type": "rnn",
+        "cell": "gru",
+        "features": 32
+      },
+      {
+        "type": "fc",
+        "features": -1
+      }
+    ],
+    "critic_architecture": [
+      {
+        "type": "fc",
+        "features": 64,
+        "activation": "tanh"
+      },
+      {
+        "type": "rnn",
+        "cell": "gru",
+        "features": 32
+      },
+      {
+        "type": "fc",
+        "features": -1
+      }
+    ]
+  },
+  "param_shapes": "PPOState(step=[], update_step=[], timestep=Timestep(obs=[16, 2], action=[16], reward=[16], done=[16]), env_state=RecordEpisodeStatisticsState(env_state=PopGymState(step=[16]), episode_returns=[16], discounted_episode_returns=[16], episode_discount=[16], episode_lengths=[16], returned_episode_returns=[16], returned_discounted_episode_returns=[16], returned_episode_lengths=[16]), actor_params={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [2], 'kernel': [32, 2]}}}}}, actor_optimizer_state=(EmptyState(), (ScaleByAdamState(count=[], mu={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [2], 'kernel': [32, 2]}}}}}, nu={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [2], 'kernel': [32, 2]}}}}}), EmptyState())), actor_carry=(None, [16, 32], None), critic_params={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [1], 'kernel': [32, 1]}}}}}, critic_optimizer_state=(EmptyState(), (ScaleByAdamState(count=[], mu={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [1], 'kernel': [32, 1]}}}}}, nu={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'Dense_0': {'bias': [64], 'kernel': [64, 64]}}, 'blocks_1': {'cell': {'hn': {'bias': [32], 'kernel': [32, 32]}, 'hr': {'kernel': [32, 32]}, 'hz': {'kernel': [32, 32]}, 'in': {'bias': [32], 'kernel': [64, 32]}, 'ir': {'bias': [32], 'kernel': [64, 32]}, 'iz': {'bias': [32], 'kernel': [64, 32]}}}, 'blocks_2': {'Dense_0': {'bias': [1], 'kernel': [32, 1]}}}}}), EmptyState())), critic_carry=(None, [16, 32], None))"
+}

@@ -1,0 +1,28 @@
+name: stream_eprop
+embed_dim: 64
+num_envs: 1
+gamma: 0.99
+trace_lambda: 0.95
+actor_lr: 0.0007
+critic_lr: 0.0007
+actor_kappa: 0.2
+critic_kappa: 0.5
+entropy_coefficient: 0.01
+adaptive: false
+device: cpu
+actor_architecture:
+- type: rnn
+  cell: eprop_lstm
+  features: 64
+  trace_lambda: 0.95
+  activation: tanh
+- type: fc
+  features: -1
+critic_architecture:
+- type: rnn
+  cell: eprop_lstm
+  features: 64
+  trace_lambda: 0.95
+  activation: tanh
+- type: fc
+  features: -1

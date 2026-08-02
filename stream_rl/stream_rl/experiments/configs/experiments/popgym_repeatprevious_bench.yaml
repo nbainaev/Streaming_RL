@@ -15,7 +15,7 @@
 # every architecture in the original benchmark run while Easy (k=4) did
 # learn for several models. gamma*lambda=0.9603 keeps ~0.9603^32=0.28 and
 # ~0.9603^64=0.079 of the signal at those lags respectively.
-max_parallel: 4
+max_parallel: 1
 schedule: parallel
 work_dir: .exp_runner_popgym_repeatprevious_bench
 

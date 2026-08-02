@@ -14,7 +14,7 @@ actor_kappa: 0.2
 critic_kappa: 0.5
 
 entropy_coefficient: 0.01
-adaptive: false
+adaptive: true
 tbptt_steps: 1
 
 actor_architecture:

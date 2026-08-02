@@ -1,0 +1,13 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_active_generalization_bench/tmaze_active_gen_ac_eprop_gru_symmetric/tmaze_active_gen_ac_eprop_gru_symmetric_L25__027d3710e1__aa32858b/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_active_generalization_bench/tmaze_active_gen_ac_eprop_gru_symmetric/tmaze_active_gen_ac_eprop_gru_symmetric_L25__027d3710e1__aa32858b/env.yaml
+scenario_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/scenario/tmaze_active_generalization_L25.yaml
+experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+log_root: logs/tmaze_active_bench
+total_timesteps: 109000
+log_every: 1000
+step_chunk: 500
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1
+variant_name: tmaze_active_gen_ac_eprop_gru_symmetric_L25
+run_id: tmaze_active_gen_ac_eprop_gru_symmetric_L25__027d3710e1__aa32858b

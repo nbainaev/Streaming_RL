@@ -1,0 +1,3 @@
+{"seed": 0, "step": 7000, "trigger_step": 7000, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 7000, "trigger_step": 7000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 1}}}}
+{"seed": 0, "step": 7500, "trigger_step": 7500, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 2}}}}

@@ -12,7 +12,7 @@
 # (Easy/Hard use 1 deck, Medium 2 decks -> 209), so a modest trace bump
 # (gamma*lambda=0.9405 vs. the old 0.891) still helps propagate credit
 # across a full episode without much added variance.
-max_parallel: 4
+max_parallel: 1
 schedule: parallel
 work_dir: .exp_runner_popgym_concentration_bench
 

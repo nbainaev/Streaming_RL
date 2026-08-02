@@ -1,0 +1,18 @@
+{"seed": 0, "step": 84000, "trigger_step": 84000, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 84000, "trigger_step": 84000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 100}}}}
+{"seed": 0, "step": 89000, "trigger_step": 89000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 300}}}}
+{"seed": 0, "step": 94000, "trigger_step": 94000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 500}}}}
+{"seed": 0, "step": 99000, "trigger_step": 99000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 700}}}}
+{"seed": 0, "step": 104000, "trigger_step": 104000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 1000}}}}
+{"seed": 42, "step": 84000, "trigger_step": 84000, "action": "freeze_agent", "params": {}}
+{"seed": 42, "step": 84000, "trigger_step": 84000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 100}}}}
+{"seed": 42, "step": 89000, "trigger_step": 89000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 300}}}}
+{"seed": 42, "step": 94000, "trigger_step": 94000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 500}}}}
+{"seed": 42, "step": 99000, "trigger_step": 99000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 700}}}}
+{"seed": 42, "step": 104000, "trigger_step": 104000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 1000}}}}
+{"seed": 123, "step": 84000, "trigger_step": 84000, "action": "freeze_agent", "params": {}}
+{"seed": 123, "step": 84000, "trigger_step": 84000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 100}}}}
+{"seed": 123, "step": 89000, "trigger_step": 89000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 300}}}}
+{"seed": 123, "step": 94000, "trigger_step": 94000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 500}}}}
+{"seed": 123, "step": 99000, "trigger_step": 99000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 700}}}}
+{"seed": 123, "step": 104000, "trigger_step": 104000, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length": 1000}}}}

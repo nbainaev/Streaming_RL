@@ -15,7 +15,7 @@
 #
 # Base runner configs, agent configs, gamma=0.999 and trace_lambda=0.95
 # mirror tmaze_active_bench.yaml so the two benchmarks stay comparable.
-max_parallel: 8
+max_parallel: 1
 schedule: parallel
 work_dir: .exp_runner_active_generalization_bench
 
@@ -110,6 +110,7 @@ experiments:
       env.kwargs.corridor_length: 5
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt1_L10
     command: uv run runners/base_runner.py
@@ -126,6 +127,7 @@ experiments:
       env.kwargs.corridor_length: 10
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt1_L25
     command: uv run runners/base_runner.py
@@ -142,6 +144,7 @@ experiments:
       env.kwargs.corridor_length: 25
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt1_L35
     command: uv run runners/base_runner.py
@@ -158,6 +161,7 @@ experiments:
       env.kwargs.corridor_length: 35
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt1_L50
     command: uv run runners/base_runner.py
@@ -174,6 +178,7 @@ experiments:
       env.kwargs.corridor_length: 50
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt1_L5
     command: uv run runners/base_runner.py
@@ -190,6 +195,7 @@ experiments:
       env.kwargs.corridor_length: 5
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt1_L10
     command: uv run runners/base_runner.py
@@ -206,6 +212,7 @@ experiments:
       env.kwargs.corridor_length: 10
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt1_L25
     command: uv run runners/base_runner.py
@@ -222,6 +229,7 @@ experiments:
       env.kwargs.corridor_length: 25
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt1_L35
     command: uv run runners/base_runner.py
@@ -238,6 +246,7 @@ experiments:
       env.kwargs.corridor_length: 35
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt1_L50
     command: uv run runners/base_runner.py
@@ -254,6 +263,7 @@ experiments:
       env.kwargs.corridor_length: 50
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt5_L5
     command: uv run runners/base_runner.py
@@ -270,6 +280,7 @@ experiments:
       env.kwargs.corridor_length: 5
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt5_L10
     command: uv run runners/base_runner.py
@@ -286,6 +297,7 @@ experiments:
       env.kwargs.corridor_length: 10
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt5_L25
     command: uv run runners/base_runner.py
@@ -302,6 +314,7 @@ experiments:
       env.kwargs.corridor_length: 25
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt5_L35
     command: uv run runners/base_runner.py
@@ -318,6 +331,7 @@ experiments:
       env.kwargs.corridor_length: 35
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_gru_bptt5_L50
     command: uv run runners/base_runner.py
@@ -334,6 +348,7 @@ experiments:
       env.kwargs.corridor_length: 50
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt5_L5
     command: uv run runners/base_runner.py
@@ -350,6 +365,7 @@ experiments:
       env.kwargs.corridor_length: 5
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt5_L10
     command: uv run runners/base_runner.py
@@ -366,6 +382,7 @@ experiments:
       env.kwargs.corridor_length: 10
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt5_L25
     command: uv run runners/base_runner.py
@@ -382,6 +399,7 @@ experiments:
       env.kwargs.corridor_length: 25
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt5_L35
     command: uv run runners/base_runner.py
@@ -398,6 +416,7 @@ experiments:
       env.kwargs.corridor_length: 35
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_bptt5_L50
     command: uv run runners/base_runner.py
@@ -414,6 +433,7 @@ experiments:
       env.kwargs.corridor_length: 50
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_rtrl_L5
     command: uv run runners/base_runner.py
@@ -430,6 +450,7 @@ experiments:
       env.kwargs.corridor_length: 5
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_rtrl_L10
     command: uv run runners/base_runner.py
@@ -446,6 +467,7 @@ experiments:
       env.kwargs.corridor_length: 10
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_rtrl_L25
     command: uv run runners/base_runner.py
@@ -462,6 +484,7 @@ experiments:
       env.kwargs.corridor_length: 25
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_rtrl_L35
     command: uv run runners/base_runner.py
@@ -478,6 +501,7 @@ experiments:
       env.kwargs.corridor_length: 35
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_rtu_rtrl_L50
     command: uv run runners/base_runner.py
@@ -494,6 +518,7 @@ experiments:
       env.kwargs.corridor_length: 50
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_rnn_L5
     command: uv run runners/base_runner.py
@@ -511,6 +536,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_rnn_L10
     command: uv run runners/base_runner.py
@@ -528,6 +554,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_rnn_L25
     command: uv run runners/base_runner.py
@@ -545,6 +572,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_rnn_L35
     command: uv run runners/base_runner.py
@@ -562,6 +590,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_rnn_L50
     command: uv run runners/base_runner.py
@@ -579,6 +608,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_gru_symmetric_L5
     command: uv run runners/base_runner.py
@@ -596,6 +626,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_gru_symmetric_L10
     command: uv run runners/base_runner.py
@@ -613,6 +644,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_gru_symmetric_L25
     command: uv run runners/base_runner.py
@@ -630,6 +662,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_gru_symmetric_L35
     command: uv run runners/base_runner.py
@@ -647,6 +680,7 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15
 
   - name: tmaze_active_gen_ac_eprop_gru_symmetric_L50
     command: uv run runners/base_runner.py
@@ -664,3 +698,4 @@ experiments:
       agent.gamma: 0.999
       agent.trace_lambda: 0.95
       agent.trace_decay: 0.9
+      agent.entropy_coefficient: 0.15

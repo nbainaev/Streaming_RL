@@ -21,10 +21,10 @@ step-size normalization (`_obgd_update`, identical to
 `memorax.algorithms.stream_ac.StreamAC._obgd_update`).
 
 Three parameter groups are updated every step:
-  - embedding (Dense+tanh, before the recurrent cell): ordinary exact
+  - embedding (Dense+tanh, before the recurrent cell(s)): ordinary exact
     gradient (feedforward, single step — no approximation needed).
   - readout (head): ordinary exact gradient, same reasoning.
-  - the recurrent cell's own weights: `learning_signal (x) local_trace`,
+  - each recurrent cell's own weights: `learning_signal (x) local_trace`,
     where `local_trace` comes from the cell's own forward pass
     (`stream_rl.src.models.eprop_layers`) and `learning_signal` is the
     feedback-mode-dependent broadcast of the *readout-level* error
@@ -35,12 +35,24 @@ Three parameter groups are updated every step:
 
 Feedback modes (the "connectivity matrix" from the project brief):
   - "symmetric": cell weights also get the ordinary exact gradient (no
-    approximation at all — equivalent to stock StreamAC + this cell).
-  - "random": a fixed matrix B, sampled once at init from `feedback_seed`,
-    broadcasts the readout-level error into hidden space (Bellec et al.'s
-    reward-modulated / random e-prop).
-  - "adaptive": B starts random and is nudged toward the true readout
-    weights via a slow EMA (`feedback_lr`), interpolating between the two.
+    approximation at all — equivalent to stock StreamAC + these cells).
+  - "random": a fixed matrix B per layer, sampled once at init from
+    `feedback_seed`, broadcasts the readout-level error into that layer's
+    hidden space (Bellec et al.'s reward-modulated / random e-prop).
+  - "adaptive": every layer's B starts random and is nudged toward the true
+    readout weights via a slow EMA (`feedback_lr`) -- for layers other than
+    the last, this is a pragmatic approximation (there's no single "true"
+    target for an intermediate layer's feedback matrix under multi-layer
+    credit assignment; nudging every layer toward the head's kernel is the
+    common shallow feedback-alignment simplification).
+
+Stacking (`cfg.num_layers > 1`): `num_layers` identical cells (same `cell`
+type, `hidden_size`, `trace_decay`, `activation`) are chained sequentially,
+embed -> cell_0 -> cell_1 -> ... -> head. Each cell's own optional LayerNorm
+(`use_layernorm`) already normalizes its output before it becomes the next
+layer's input, so no separate inter-layer normalization is needed. Layer 0
+consumes `embed_dim`-wide input; every later layer consumes the previous
+layer's `hidden_size`-wide (post-LayerNorm) output.
 """
 from typing import Any
 
@@ -95,10 +107,11 @@ class StreamEpropConfig:
     embed_dim: int
     hidden_size: int
     cell: str = "eprop_gru"                # "eprop_rnn" | "eprop_gru" | "eprop_lstm"
+    num_layers: int = 1                    # stack this many identical eprop cells sequentially
     activation: str = "tanh"
     trace_decay: float = 0.9               # e-prop cell's own eligibility trace decay
-    use_layernorm: bool = True             # LayerNorm on the cell's readout-facing output (not the carried state)
-    use_sparse_init: bool = True           # sparse init (Elsayed et al., 2024) for the cell's input-side kernels
+    use_layernorm: bool = True             # LayerNorm on each cell's readout-facing output (not the carried state)
+    use_sparse_init: bool = True           # sparse init (Elsayed et al., 2024) for each cell's input-side kernels
     sparsity: float = 0.9
     trace_lambda: float = 0.9              # outer streaming (TD-lambda-style) trace, as in stock StreamAC
     actor_lr: float = 1.0
@@ -122,14 +135,14 @@ class StreamEpropState:
     env_state: EnvState
     actor_params: PyTree
     critic_params: PyTree
-    actor_carry: Any
-    critic_carry: Any
+    actor_carry: Any                       # tuple of per-layer EpropCarry
+    critic_carry: Any                      # tuple of per-layer EpropCarry
     actor_v: PyTree
     critic_v: PyTree
     actor_traces: PyTree
     critic_traces: PyTree
-    actor_feedback: Array
-    critic_feedback: Array
+    actor_feedback: Any                    # tuple of per-layer feedback matrices
+    critic_feedback: Any                   # tuple of per-layer feedback matrices
 
 
 class StreamEprop:
@@ -138,26 +151,33 @@ class StreamEprop:
         self.env = env
         self.env_params = env_params
 
+        if cfg.num_layers < 1:
+            raise ValueError(f"num_layers must be >= 1, got {cfg.num_layers!r}")
+
         action_space = env.action_space(env_params)
         self.is_discrete = isinstance(action_space, Discrete) or hasattr(action_space, "n")
         self.action_dim = int(action_space.n) if self.is_discrete else int(action_space.shape[0])
 
         self.actor_embed = nn.Dense(cfg.embed_dim, name="embed")
         self.critic_embed = nn.Dense(cfg.embed_dim, name="embed")
-        self.actor_cell = build_eprop_cell(
-            cfg.cell, cfg.hidden_size, cfg.trace_decay, cfg.activation,
-            use_layernorm=cfg.use_layernorm, use_sparse_init=cfg.use_sparse_init, sparsity=cfg.sparsity,
-        )
-        self.critic_cell = build_eprop_cell(
-            cfg.cell, cfg.hidden_size, cfg.trace_decay, cfg.activation,
-            use_layernorm=cfg.use_layernorm, use_sparse_init=cfg.use_sparse_init, sparsity=cfg.sparsity,
-        )
+
+        def _build_cells():
+            return [
+                build_eprop_cell(
+                    cfg.cell, cfg.hidden_size, cfg.trace_decay, cfg.activation,
+                    use_layernorm=cfg.use_layernorm, use_sparse_init=cfg.use_sparse_init, sparsity=cfg.sparsity,
+                )
+                for _ in range(cfg.num_layers)
+            ]
+
+        self.actor_cells = _build_cells()
+        self.critic_cells = _build_cells()
         self.actor_head = (
             _DiscretePolicyHead(self.action_dim) if self.is_discrete else _ContinuousPolicyHead(self.action_dim)
         )
         self.critic_head = _ValueHead()
 
-        self._out_dim = self.action_dim  # width of the readout the feedback matrix broadcasts from
+        self._out_dim = self.action_dim  # width of the readout the feedback matrices broadcast from
 
     # ---- distribution helper ----
     def _make_dist(self, actor_out):
@@ -166,9 +186,34 @@ class StreamEprop:
         mean, std = actor_out
         return distrax.MultivariateNormalDiag(loc=mean, scale_diag=std)
 
+    # ---- layer-stack forward pass ----
+    def _layer_input_dims(self) -> list[int]:
+        return [self.cfg.embed_dim] + [self.cfg.hidden_size] * (self.cfg.num_layers - 1)
+
+    def _init_carries(self, cells: list) -> tuple:
+        return tuple(
+            cell.initialize_carry(None, (self.cfg.num_envs, in_dim))
+            for cell, in_dim in zip(cells, self._layer_input_dims())
+        )
+
+    def _apply_stack(self, cells: list, params_list: list, carries_in: tuple, x: Array) -> tuple[tuple, Array]:
+        h = x
+        new_carries = []
+        for cell, params, carry in zip(cells, params_list, carries_in):
+            new_carry, h = cell.apply(params, h, initial_carry=carry)
+            new_carries.append(new_carry)
+        return tuple(new_carries), h
+
     # ---- init ----
     def init(self, key: Key) -> StreamEpropState:
-        (env_key, ae_key, ac_key, ah_key, ce_key, cc_key, ch_key, afb_key, cfb_key) = jax.random.split(key, 9)
+        n = self.cfg.num_layers
+        keys = list(jax.random.split(key, 7 + 2 * n))
+        it = iter(keys)
+        env_key, ae_key = next(it), next(it)
+        ac_keys = [next(it) for _ in range(n)]
+        ah_key, ce_key = next(it), next(it)
+        cc_keys = [next(it) for _ in range(n)]
+        ch_key, afb_key, cfb_key = next(it), next(it), next(it)
 
         env_keys = jax.random.split(env_key, self.cfg.num_envs)
         obs, env_state = jax.vmap(self.env.reset, in_axes=(0, None))(env_keys, self.env_params)
@@ -178,31 +223,47 @@ class StreamEprop:
         done = jnp.ones((self.cfg.num_envs,), dtype=jnp.bool_)
         timestep = Timestep(obs=obs, action=action, reward=reward, done=done)
 
-        actor_carry = self.actor_cell.initialize_carry(None, (self.cfg.num_envs, self.cfg.embed_dim))
-        critic_carry = self.critic_cell.initialize_carry(None, (self.cfg.num_envs, self.cfg.embed_dim))
+        actor_carry = self._init_carries(self.actor_cells)
+        critic_carry = self._init_carries(self.critic_cells)
 
         actor_embed_params = self.actor_embed.init(ae_key, obs)
         x0 = self.actor_embed.apply(actor_embed_params, obs)
-        actor_cell_params = self.actor_cell.init(ac_key, x0, initial_carry=actor_carry)
-        _, h0_actor = self.actor_cell.apply(actor_cell_params, x0, initial_carry=actor_carry)
-        actor_head_params = self.actor_head.init(ah_key, h0_actor)
+        actor_cell_params = []
+        h = x0
+        for cell, k, carry in zip(self.actor_cells, ac_keys, actor_carry):
+            p = cell.init(k, h, initial_carry=carry)
+            _, h = cell.apply(p, h, initial_carry=carry)
+            actor_cell_params.append(p)
+        actor_head_params = self.actor_head.init(ah_key, h)
 
         critic_embed_params = self.critic_embed.init(ce_key, obs)
         xc0 = self.critic_embed.apply(critic_embed_params, obs)
-        critic_cell_params = self.critic_cell.init(cc_key, xc0, initial_carry=critic_carry)
-        _, h0_critic = self.critic_cell.apply(critic_cell_params, xc0, initial_carry=critic_carry)
-        critic_head_params = self.critic_head.init(ch_key, h0_critic)
+        critic_cell_params = []
+        hc = xc0
+        for cell, k, carry in zip(self.critic_cells, cc_keys, critic_carry):
+            p = cell.init(k, hc, initial_carry=carry)
+            _, hc = cell.apply(p, hc, initial_carry=carry)
+            critic_cell_params.append(p)
+        critic_head_params = self.critic_head.init(ch_key, hc)
 
-        actor_params = {"embed": actor_embed_params, "cell": actor_cell_params, "head": actor_head_params}
-        critic_params = {"embed": critic_embed_params, "cell": critic_cell_params, "head": critic_head_params}
+        actor_params = {"embed": actor_embed_params, "cells": actor_cell_params, "head": actor_head_params}
+        critic_params = {"embed": critic_embed_params, "cells": critic_cell_params, "head": critic_head_params}
 
         actor_traces = jax.tree.map(lambda p: jnp.zeros((self.cfg.num_envs, *p.shape), dtype=jnp.float32), actor_params)
         critic_traces = jax.tree.map(lambda p: jnp.zeros((self.cfg.num_envs, *p.shape), dtype=jnp.float32), critic_params)
         actor_v = jax.tree.map(jnp.zeros_like, actor_traces)
         critic_v = jax.tree.map(jnp.zeros_like, critic_traces)
 
-        actor_feedback = jax.random.normal(afb_key, (self.cfg.hidden_size, self._out_dim)) / jnp.sqrt(self.cfg.hidden_size)
-        critic_feedback = jax.random.normal(cfb_key, (self.cfg.hidden_size, 1)) / jnp.sqrt(self.cfg.hidden_size)
+        afb_keys = jax.random.split(afb_key, n)
+        cfb_keys = jax.random.split(cfb_key, n)
+        actor_feedback = tuple(
+            jax.random.normal(k, (self.cfg.hidden_size, self._out_dim)) / jnp.sqrt(self.cfg.hidden_size)
+            for k in afb_keys
+        )
+        critic_feedback = tuple(
+            jax.random.normal(k, (self.cfg.hidden_size, 1)) / jnp.sqrt(self.cfg.hidden_size)
+            for k in cfb_keys
+        )
 
         return StreamEpropState(
             step=0, update_step=0, timestep=timestep, env_state=env_state,
@@ -214,9 +275,10 @@ class StreamEprop:
         )
 
     # ---- per-role gradient computation ----
-    def _role_grads(self, *, is_actor: bool, embed, cell, head, params, obs, carry_in, new_carry,
+    def _role_grads(self, *, is_actor: bool, embed, cells, head, params, obs, carry_in, new_carry,
                      x, h, action, td_error, feedback):
-        embed_params, cell_params, head_params = params["embed"], params["cell"], params["head"]
+        embed_params, cells_params, head_params = params["embed"], params["cells"], params["head"]
+        num_layers = len(cells)
 
         def scalar_loss(out):
             if is_actor:
@@ -226,7 +288,7 @@ class StreamEprop:
 
         def embed_loss(embed_params_):
             x_ = embed.apply(embed_params_, obs)
-            _, h_ = cell.apply(cell_params, x_, initial_carry=carry_in)
+            _, h_ = self._apply_stack(cells, cells_params, carry_in, x_)
             return scalar_loss(head.apply(head_params, h_))
 
         def head_loss(head_params_):
@@ -236,11 +298,15 @@ class StreamEprop:
         head_grad = jax.jacobian(head_loss)(head_params)
 
         if self.cfg.feedback_mode == "symmetric":
-            def cell_loss(cell_params_):
-                _, h_ = cell.apply(cell_params_, x, initial_carry=carry_in)
-                return scalar_loss(head.apply(head_params, h_))
+            cells_grad = []
+            for i in range(num_layers):
+                def cell_i_loss(cell_i_params, i=i):
+                    layer_params = list(cells_params)
+                    layer_params[i] = cell_i_params
+                    _, h_ = self._apply_stack(cells, layer_params, carry_in, x)
+                    return scalar_loss(head.apply(head_params, h_))
 
-            cell_grad = jax.jacobian(cell_loss)(cell_params)
+                cells_grad.append(jax.jacobian(cell_i_loss)(cells_params[i]))
             new_feedback = feedback
         else:
             # Output-space error e_readout[n] = d(loss_n)/d(primary_output_n),
@@ -274,9 +340,7 @@ class StreamEprop:
                 primary, action_arg, td_error, std
             )
 
-            learning_signal = jnp.einsum("do,no->nd", feedback, e_readout)
-
-            def trace_based_cell_grad(cell_params_dict, traces):
+            def trace_based_cell_grad(cell_params_dict, traces, learning_signal):
                 grad = {}
                 for pname, pval in cell_params_dict.items():
                     trace_key = "e_" + pname
@@ -298,15 +362,27 @@ class StreamEprop:
                         grad[pname] = trace * learning_signal
                 return grad
 
-            cell_grad = {"params": trace_based_cell_grad(cell_params["params"], new_carry.traces)}
+            cells_grad = []
+            new_feedback_list = []
+            for i in range(num_layers):
+                fb_i = feedback[i]
+                learning_signal_i = jnp.einsum("do,no->nd", fb_i, e_readout)
+                cells_grad.append({
+                    "params": trace_based_cell_grad(cells_params[i]["params"], new_carry[i].traces, learning_signal_i)
+                })
+                if self.cfg.feedback_mode == "adaptive":
+                    # No single "true" target exists for an intermediate
+                    # layer's feedback matrix; nudging every layer toward the
+                    # head's own kernel (shape-compatible since all layers
+                    # share hidden_size) is the standard shallow
+                    # feedback-alignment simplification for this case.
+                    out_kernel = head_params["params"]["out"]["kernel"]
+                    new_feedback_list.append((1.0 - self.cfg.feedback_lr) * fb_i + self.cfg.feedback_lr * out_kernel)
+                else:
+                    new_feedback_list.append(fb_i)
+            new_feedback = tuple(new_feedback_list)
 
-            if self.cfg.feedback_mode == "adaptive":
-                out_kernel = head_params["params"]["out"]["kernel"]
-                new_feedback = (1.0 - self.cfg.feedback_lr) * feedback + self.cfg.feedback_lr * out_kernel
-            else:
-                new_feedback = feedback
-
-        grads = {"embed": embed_grad, "cell": cell_grad, "head": head_grad}
+        grads = {"embed": embed_grad, "cells": cells_grad, "head": head_grad}
         return grads, new_feedback
 
     # ---- ObGD (copied from memorax.algorithms.stream_ac.StreamAC._obgd_update) ----
@@ -356,7 +432,7 @@ class StreamEprop:
     # ---- action selection (deterministic, for evaluate()) ----
     def _deterministic_action(self, key, state):
         x = self.actor_embed.apply(state.actor_params["embed"], state.timestep.obs)
-        actor_carry, h = self.actor_cell.apply(state.actor_params["cell"], x, initial_carry=state.actor_carry)
+        actor_carry, h = self._apply_stack(self.actor_cells, state.actor_params["cells"], state.actor_carry, x)
         out = self.actor_head.apply(state.actor_params["head"], h)
         dist = self._make_dist(out)
         action = jnp.argmax(out, axis=-1) if self.is_discrete else dist.mode()
@@ -388,14 +464,14 @@ class StreamEprop:
         critic_carry_in = jax.lax.stop_gradient(state.critic_carry)
 
         x_actor = self.actor_embed.apply(state.actor_params["embed"], obs)
-        new_actor_carry, h_actor = self.actor_cell.apply(state.actor_params["cell"], x_actor, initial_carry=actor_carry_in)
+        new_actor_carry, h_actor = self._apply_stack(self.actor_cells, state.actor_params["cells"], actor_carry_in, x_actor)
         actor_out = self.actor_head.apply(state.actor_params["head"], h_actor)
         dist = self._make_dist(actor_out)
         action, log_prob = dist.sample_and_log_prob(seed=action_key)
         entropy = dist.entropy().mean()
 
         x_critic = self.critic_embed.apply(state.critic_params["embed"], obs)
-        new_critic_carry, h_critic = self.critic_cell.apply(state.critic_params["cell"], x_critic, initial_carry=critic_carry_in)
+        new_critic_carry, h_critic = self._apply_stack(self.critic_cells, state.critic_params["cells"], critic_carry_in, x_critic)
         value = remove_feature_axis(self.critic_head.apply(state.critic_params["head"], h_critic))
 
         num_envs = obs.shape[0]
@@ -406,8 +482,8 @@ class StreamEprop:
 
         critic_params_sg = jax.lax.stop_gradient(state.critic_params)
         x_critic_next = self.critic_embed.apply(critic_params_sg["embed"], next_obs)
-        _, h_critic_next = self.critic_cell.apply(
-            critic_params_sg["cell"], x_critic_next, initial_carry=jax.lax.stop_gradient(new_critic_carry)
+        _, h_critic_next = self._apply_stack(
+            self.critic_cells, critic_params_sg["cells"], jax.lax.stop_gradient(new_critic_carry), x_critic_next
         )
         next_value = remove_feature_axis(self.critic_head.apply(critic_params_sg["head"], h_critic_next))
 
@@ -415,12 +491,12 @@ class StreamEprop:
         td_error = next_reward + gamma * (1 - next_done) * next_value - value
 
         actor_grads, new_actor_feedback = self._role_grads(
-            is_actor=True, embed=self.actor_embed, cell=self.actor_cell, head=self.actor_head,
+            is_actor=True, embed=self.actor_embed, cells=self.actor_cells, head=self.actor_head,
             params=state.actor_params, obs=obs, carry_in=actor_carry_in, new_carry=new_actor_carry,
             x=x_actor, h=h_actor, action=action, td_error=td_error, feedback=state.actor_feedback,
         )
         critic_grads, new_critic_feedback = self._role_grads(
-            is_actor=False, embed=self.critic_embed, cell=self.critic_cell, head=self.critic_head,
+            is_actor=False, embed=self.critic_embed, cells=self.critic_cells, head=self.critic_head,
             params=state.critic_params, obs=obs, carry_in=critic_carry_in, new_carry=new_critic_carry,
             x=x_critic, h=h_critic, action=None, td_error=td_error, feedback=state.critic_feedback,
         )
@@ -451,8 +527,8 @@ class StreamEprop:
             "critic/td_error": td_error.mean(),
             "actor/entropy": entropy,
             "critic/value": value.mean(),
-            "actor/feedback_norm": jnp.linalg.norm(new_actor_feedback),
-            "critic/feedback_norm": jnp.linalg.norm(new_critic_feedback),
+            "actor/feedback_norm": sum(jnp.linalg.norm(fb) for fb in new_actor_feedback),
+            "critic/feedback_norm": sum(jnp.linalg.norm(fb) for fb in new_critic_feedback),
         })
 
         state = state.replace(
@@ -483,8 +559,8 @@ class StreamEprop:
                             dtype=self.env.action_space(self.env_params).dtype)
         reward = jnp.zeros((self.cfg.num_envs,), dtype=jnp.float32)
         done = jnp.ones((self.cfg.num_envs,), dtype=jnp.bool_)
-        actor_carry = self.actor_cell.initialize_carry(None, (self.cfg.num_envs, self.cfg.embed_dim))
-        critic_carry = self.critic_cell.initialize_carry(None, (self.cfg.num_envs, self.cfg.embed_dim))
+        actor_carry = self._init_carries(self.actor_cells)
+        critic_carry = self._init_carries(self.critic_cells)
 
         state = state.replace(
             timestep=Timestep(obs=obs, action=action, reward=reward, done=done),
