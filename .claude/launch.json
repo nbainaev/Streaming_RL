@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "streamlit-viewer",
+      "runtimeExecutable": "stream_rl/.venv/Scripts/streamlit.exe",
+      "runtimeArgs": ["run", "stream_rl/stream_rl/apps/streamlit_viewer.py", "--server.headless", "true"],
+      "port": 8501,
+      "autoPort": true
+    }
+  ]
+}

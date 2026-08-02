@@ -1,0 +1,79 @@
+max_parallel: 8
+schedule: parallel
+work_dir: .exp_runner_active_generalization_bench_pilot
+experiments:
+- name: tmaze_active_gen_ppo_gru_L5
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: tmaze_active_gen_ppo_gru_pilot
+    runner.total_timesteps: 49000
+    runner.log_every: 1000
+    runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+    env.namespace: tmaze
+    env.env_id: tmaze_active
+    env.kwargs.goal_reward: 1.0
+    env.kwargs.corridor_length: 5
+    agent.gamma: 0.999
+- name: tmaze_active_gen_ppo_gru_L10
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: tmaze_active_gen_ppo_gru_pilot
+    runner.total_timesteps: 64000
+    runner.log_every: 1000
+    runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+    env.namespace: tmaze
+    env.env_id: tmaze_active
+    env.kwargs.goal_reward: 1.0
+    env.kwargs.corridor_length: 10
+    agent.gamma: 0.999
+- name: tmaze_active_gen_ppo_gru_L25
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: tmaze_active_gen_ppo_gru_pilot
+    runner.total_timesteps: 109000
+    runner.log_every: 1000
+    runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+    env.namespace: tmaze
+    env.env_id: tmaze_active
+    env.kwargs.goal_reward: 1.0
+    env.kwargs.corridor_length: 25
+    agent.gamma: 0.999
+- name: tmaze_active_gen_ppo_gru_L35
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: tmaze_active_gen_ppo_gru_pilot
+    runner.total_timesteps: 139000
+    runner.log_every: 1000
+    runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+    env.namespace: tmaze
+    env.env_id: tmaze_active
+    env.kwargs.goal_reward: 1.0
+    env.kwargs.corridor_length: 35
+    agent.gamma: 0.999
+- name: tmaze_active_gen_ppo_gru_L50
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: tmaze_active_gen_ppo_gru_pilot
+    runner.total_timesteps: 184000
+    runner.log_every: 1000
+    runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+    env.namespace: tmaze
+    env.env_id: tmaze_active
+    env.kwargs.goal_reward: 1.0
+    env.kwargs.corridor_length: 50
+    agent.gamma: 0.999

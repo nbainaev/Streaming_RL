@@ -1,0 +1,17 @@
+max_parallel: 4
+schedule: parallel
+work_dir: .exp_runner_popgym_autoencode_bench_pilot
+experiments:
+- name: popgym_autoencode_ppo_gru
+  command: uv run runners/base_runner.py
+  base_runner_config: ../runner/popgym_base_ppo_gru.yaml
+  seeds:
+  - 0
+  overrides:
+    runner.experiment_name: popgym_autoencode_ppo_gru_pilot
+    env.namespace: popgym
+  grid:
+    env.env_id:
+    - popgym-AutoencodeEasy
+    - popgym-AutoencodeMedium
+    - popgym-AutoencodeHard

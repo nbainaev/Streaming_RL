@@ -1,0 +1,20 @@
+agent_config: ../agents/eprop_stream_ac.yaml
+env_config: ../envs/tmaze_passive.yaml
+scenario_config: ../scenario/tmaze.yaml
+
+# seed: 0
+
+experiment_name: tmaze_ac_eprop
+log_root: logs/test
+total_timesteps: 6000
+log_every: 500
+checkpoint_every: 3000
+eval_every: -1
+eval_steps: -1
+
+# variant_name: tmaze_ac_lambda_rtu_bptt__kwargs_corridor_length=3
+# run_id: tmaze_ac_lambda_rtu_bptt__kwargs_corridor_length-3__4f90d5de63__ae0f5f94
+
+# optional, if you want episode-based periodic actions in future:
+# eval_every_episodes: 100
+# checkpoint_every_episodes: 500

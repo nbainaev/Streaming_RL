@@ -1,0 +1,666 @@
+# Generalization sweep: train each recurrent-core variant on SMALL Active
+# T-Maze corridors, then freeze the agent (unchanged) and evaluate it, in
+# the same run, on much LARGER corridors it never saw during training. Run
+# with:
+#   uv run runners/runner.py --meta-config ../experiments/tmaze_active_generalization_bench.yaml
+#
+# Unlike a single grid over corridor_length, this file has one explicit
+# block per (architecture, corridor_length): total_timesteps and the
+# scenario's freeze/eval trigger steps both depend on corridor_length (each
+# training leg is sized to 3000 episodes at that corridor_length's episode
+# length, so every corridor_length in the grid sees a comparable amount of
+# training data instead of a fixed step budget that starves long corridors).
+# Eval legs stay fixed at 5x5000 steps regardless of corridor_length, evaluating
+# the frozen agent on corridor_length in {100, 300, 500, 700, 1000}.
+#
+# Base runner configs, agent configs, gamma=0.999 and trace_lambda=0.95
+# mirror tmaze_active_bench.yaml so the two benchmarks stay comparable.
+max_parallel: 8
+schedule: parallel
+work_dir: .exp_runner_active_generalization_bench
+
+experiments:
+  - name: tmaze_active_gen_ppo_gru_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ppo_gru
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+
+  - name: tmaze_active_gen_ppo_gru_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ppo_gru
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+
+  - name: tmaze_active_gen_ppo_gru_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ppo_gru
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+
+  - name: tmaze_active_gen_ppo_gru_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ppo_gru
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+
+  - name: tmaze_active_gen_ppo_gru_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ppo_gru
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+
+  - name: tmaze_active_gen_ac_gru_bptt1_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt1
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt1_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt1
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt1_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt1
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt1_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt1
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt1_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt1
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt1_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt1
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt1_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt1
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt1_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt1
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt1_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt1
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt1_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt1
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt5_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt5
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt5_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt5
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt5_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt5
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt5_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt5
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_gru_bptt5_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_gru_bptt5
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt5_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt5
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt5_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt5
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt5_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt5
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt5_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt5
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_bptt5_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_bptt5
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_rtrl_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_rtrl
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_rtrl_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_rtrl
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_rtrl_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_rtrl
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_rtrl_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_rtrl
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_rtu_rtrl_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_rtu_rtrl
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+
+  - name: tmaze_active_gen_ac_eprop_rnn_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_rnn
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_rnn_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_rnn
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_rnn_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_rnn
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_rnn_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_rnn
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_rnn_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_rnn
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_gru_symmetric_L5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+      runner.total_timesteps: 49000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L5.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 5
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_gru_symmetric_L10
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+      runner.total_timesteps: 64000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L10.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 10
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_gru_symmetric_L25
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+      runner.total_timesteps: 109000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L25.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 25
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_gru_symmetric_L35
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+      runner.total_timesteps: 139000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L35.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 35
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+
+  - name: tmaze_active_gen_ac_eprop_gru_symmetric_L50
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_gen_ac_eprop_gru_symmetric
+      runner.total_timesteps: 184000
+      runner.log_every: 1000
+      runner.scenario_config: ../scenario/tmaze_active_generalization_L50.yaml
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      env.kwargs.corridor_length: 50
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9

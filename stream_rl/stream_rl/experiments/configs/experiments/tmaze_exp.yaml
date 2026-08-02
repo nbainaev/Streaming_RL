@@ -1,0 +1,94 @@
+max_parallel: 8
+schedule: parallel
+work_dir: .exp_runner
+
+experiments:
+  - name: tmaze_ac_lambda_rtu_bptt_5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_base.yaml
+    seeds: [0, 42, 123, 777]
+    overrides:
+      runner.experiment_name: tmaze_ac_lambda_rtu_bptt_5
+      runner.total_timesteps: 7000
+      runner.log_every: 100
+      runner.checkpoint_every: 1500
+      runner.scenario_config: ../scenario/tmaze_freeze.yaml
+      runner.agent_config: ../agents/stream_ac_rtu_bptt.yaml
+      agent.tbptt_steps: 5
+      env.namespace: tmaze
+      env.env_id: tmaze_passive
+      env.kwargs.goal_reward: 1.0
+      # penalty intentionally omitted: defaults to -1/(episode_length-1),
+      # matching the Passive T-Maze reward definition, and stays correct
+      # across the corridor_length grid below (a fixed override would not).
+    grid:
+      env.kwargs.corridor_length: [3, 5, 10, 20, 30, 40, 50]
+
+  # - name: tmaze_ac_lambda_rtu_rtrl
+  #   command: uv run runners/base_runner.py
+  #   base_runner_config: ../runner/tmaze_base.yaml
+  #   seeds: [0, 42, 123, 777]
+  #   overrides:
+  #     runner.experiment_name: tmaze_ac_lambda_rtu_rtrl
+  #     runner.total_timesteps: 7000
+  #     runner.log_every: 100
+  #     runner.checkpoint_every: 1500
+  #     runner.scenario_config: ../scenario/tmaze_freeze.yaml
+  #     runner.agent_config: ../agents/stream_ac_rtu_rtrl.yaml
+  #     env.namespace: tmaze
+  #     env.env_id: tmaze_passive
+  #     env.kwargs.goal_reward: 1.0
+  #   grid:
+  #     env.kwargs.corridor_length: [3, 5, 10, 20, 30, 40, 50]
+
+  - name: tmaze_ac_lambda_gru_5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_base.yaml
+    seeds: [0, 42, 123, 777]
+    overrides:
+      runner.experiment_name: tmaze_ac_lambda_gru_5
+      runner.total_timesteps: 7000
+      runner.log_every: 100
+      runner.checkpoint_every: 1500
+      runner.scenario_config: ../scenario/tmaze_freeze.yaml
+      runner.agent_config: ../agents/stream_ac_gru.yaml
+      agent.tbptt_steps: 5
+      env.namespace: tmaze
+      env.env_id: tmaze_passive
+      env.kwargs.goal_reward: 1.0
+    grid:
+      env.kwargs.corridor_length: [3, 5, 10, 20, 30, 40, 50]
+
+  # - name: tmaze_ppo_gru
+  #   command: uv run runners/base_runner.py
+  #   base_runner_config: ../runner/tmaze_base.yaml
+  #   seeds: [0, 42, 123, 777]
+  #   overrides:
+  #     runner.experiment_name: tmaze_ppo_gru
+  #     runner.total_timesteps: 7000
+  #     runner.log_every: 200
+  #     runner.checkpoint_every: 1500
+  #     runner.scenario_config: ../scenario/tmaze_freeze.yaml
+  #     runner.agent_config: ../agents/ppo_gru.yaml
+  #     env.namespace: tmaze
+  #     env.env_id: tmaze_passive
+  #     env.kwargs.goal_reward: 1.0
+  #   grid:
+  #     env.kwargs.corridor_length: [3, 5, 10, 20, 30, 40, 50]
+
+  # - name: tmaze_eprop_stream_rnn
+  #   command: uv run runners/base_runner.py
+  #   base_runner_config: ../runner/tmaze_base.yaml
+  #   seeds: [0, 42, 123, 777]
+  #   overrides:
+  #     runner.experiment_name: tmaze_eprop_stream_rnn
+  #     runner.total_timesteps: 7000
+  #     runner.log_every: 200
+  #     runner.checkpoint_every: 1500
+  #     runner.scenario_config: ../scenario/tmaze_freeze.yaml
+  #     runner.agent_config: ../agents/eprop_stream_ac.yaml
+  #     env.namespace: tmaze
+  #     env.env_id: tmaze_passive
+  #     env.kwargs.goal_reward: 1.0
+  #   grid:
+  #     env.kwargs.corridor_length: [3, 5, 10, 20, 30, 40, 50]

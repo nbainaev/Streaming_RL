@@ -1,0 +1,108 @@
+# Benchmark sweep: all recurrent-core variants on popgym-Concentration across
+# its Easy/Medium/Hard difficulty variants. Run with:
+#   uv run runners/runner.py --meta-config ../experiments/popgym_concentration_bench.yaml
+#
+# Mirrors tmaze_active_bench.yaml's structure/gamma-defaults but grids over
+# env.env_id (difficulty) instead of corridor_length.
+#
+# trace_lambda=0.95 (up from the shared agent default of 0.9): Concentration
+# pays reward immediately on a flip (match/no-match), so this is primarily a
+# "remember which cards are face-down where" task rather than a long
+# credit-assignment gap like Autoencode. Episodes run 105/209 steps
+# (Easy/Hard use 1 deck, Medium 2 decks -> 209), so a modest trace bump
+# (gamma*lambda=0.9405 vs. the old 0.891) still helps propagate credit
+# across a full episode without much added variance.
+max_parallel: 4
+schedule: parallel
+work_dir: .exp_runner_popgym_concentration_bench
+
+experiments:
+  - name: popgym_concentration_ppo_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ppo_gru
+      env.namespace: popgym
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_gru_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_gru_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_rtu_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_rtu_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_gru_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_gru_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_rtu_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_rtu_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_rtu_rtrl
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_rtu_rtrl
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_eprop_rnn
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_eprop_rnn
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+
+  - name: popgym_concentration_ac_eprop_gru_symmetric
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_concentration_ac_eprop_gru_symmetric
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-ConcentrationEasy, popgym-ConcentrationMedium, popgym-ConcentrationHard]
+

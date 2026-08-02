@@ -1,0 +1,183 @@
+# Benchmark sweep: all recurrent-core variants on Active T-Maze across a
+# range of corridor lengths. Run with:
+#   uv run runners/runner.py --meta-config ../experiments/tmaze_active_bench.yaml
+#
+# Each experiment points at its own base_runner_config (tmaze_active_base_
+# <model>.yaml) so its default agent_config already matches the model being
+# tested — the sweep override mechanism validates agent.* overrides against
+# whatever agent config is active *before* switching agents, so a shared
+# base pointing at e.g. PPO would reject a "trace_lambda" override meant for
+# a stream_ac variant.
+#
+# All runner/training hyperparameters (total_timesteps, log_every,
+# step_chunk, gamma, trace_lambda/trace_decay, lr, kappa) are held IDENTICAL
+# across the corridor_length grid for every model, so comparisons stay
+# apples-to-apples. gamma=0.999 (not the usual 0.99) and trace_lambda=0.95
+# are bumped up from the short-horizon defaults because corridor_length
+# ranges up to 1000 here: 0.99^1000 ~ 4e-5 would discount the terminal
+# reward into irrelevance, breaking credit assignment entirely.
+max_parallel: 4
+schedule: parallel
+work_dir: .exp_runner_active_bench
+
+experiments:
+  - name: tmaze_active_ppo_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ppo_gru
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_gru_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_gru_bptt1
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_rtu_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_rtu_bptt1
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_gru_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_gru_bptt5
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_rtu_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_rtu_bptt5
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_rtu_rtrl
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_rtu_rtrl
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_lstm
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_lstm.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_lstm
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_eprop_rnn
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_eprop_rnn
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  # AC(lambda)-GRU with the eprop cell under symmetric feedback — directly
+  # comparable to tmaze_active_ac_gru_bptt1 (mathematically near-equivalent
+  # per stream_eprop.py's own module docstring; the interesting question is
+  # how close the two land in practice).
+  - name: tmaze_active_ac_eprop_gru_symmetric
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_eprop_gru_symmetric
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_eprop_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_eprop_gru
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]
+
+  - name: tmaze_active_ac_eprop_lstm
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/tmaze_active_base_ac_eprop_lstm.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: tmaze_active_ac_eprop_lstm
+      env.namespace: tmaze
+      env.env_id: tmaze_active
+      env.kwargs.goal_reward: 1.0
+      agent.gamma: 0.999
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.kwargs.corridor_length: [100, 250, 400, 600, 800, 1000]

@@ -1,0 +1,109 @@
+# Benchmark sweep: all recurrent-core variants on popgym-Battleship across
+# its Easy/Medium/Hard difficulty variants. Run with:
+#   uv run runners/runner.py --meta-config ../experiments/popgym_battleship_bench.yaml
+#
+# Mirrors tmaze_active_bench.yaml's structure/gamma-defaults but grids over
+# env.env_id (difficulty) instead of corridor_length.
+#
+# trace_lambda=0.95 (up from the shared agent default of 0.9): Battleship's
+# reward is immediate per shot, so this isn't as credit-assignment-starved
+# as Autoencode/RepeatPrevious, but episodes still run 65/101/145 steps
+# (Easy/Medium/Hard) and the eligibility trace needs to bridge "where did I
+# already fire" memory back to the shot that revealed it. A modest bump
+# (gamma*lambda=0.9405 vs. the old 0.891) costs little and gives longer
+# credit reach without the higher-variance cost of pushing all the way to
+# Autoencode's 0.98.
+max_parallel: 4
+schedule: parallel
+work_dir: .exp_runner_popgym_battleship_bench
+
+experiments:
+  - name: popgym_battleship_ppo_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ppo_gru
+      env.namespace: popgym
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_gru_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_gru_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_rtu_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_rtu_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_gru_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_gru_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_rtu_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_rtu_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_rtu_rtrl
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_rtu_rtrl
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_eprop_rnn
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_eprop_rnn
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+
+  - name: popgym_battleship_ac_eprop_gru_symmetric
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_battleship_ac_eprop_gru_symmetric
+      env.namespace: popgym
+      agent.trace_lambda: 0.95
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-BattleshipEasy, popgym-BattleshipMedium, popgym-BattleshipHard]
+

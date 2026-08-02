@@ -1,0 +1,7 @@
+namespace: tmaze
+env_id: tmaze_passive
+kwargs:
+  corridor_length: 10
+  goal_reward: 1.0
+  # penalty omitted on purpose: defaults to -1/(episode_length-1), matching
+  # the Passive T-Maze reward definition (see experiments/task2/envs).
