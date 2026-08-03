@@ -1,0 +1,17 @@
+schedule: sequential
+work_dir: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_frozen_compile_pilot
+
+experiments:
+  - name: autoencode_easy_frozen_compile_pilot
+    command: /Users/antany/Desktop/RL/memorax/.venv/bin/python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/popgym_easy_frozen_ssm.yaml
+    seeds: [0]
+    overrides:
+      runner.experiment_name: autoencode_easy_frozen_compile_pilot
+      runner.log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy
+      runner.total_timesteps: 20000
+      runner.log_every: 2000
+      runner.step_chunk: 64
+      runner.checkpoint_every: -1
+      env.env_id: popgym-AutoencodeEasy-v0
+      agent.trace_lambda: 0.98

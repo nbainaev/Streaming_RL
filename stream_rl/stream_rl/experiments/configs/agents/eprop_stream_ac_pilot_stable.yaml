@@ -1,0 +1,23 @@
+name: stream_eprop
+device: cpu
+
+num_envs: 4
+embed_dim: 16
+hidden_size: 16
+cell: eprop_gru
+activation: tanh
+gamma: 0.99
+trace_decay: 0.95
+trace_lambda: 0.95
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 3.0
+critic_kappa: 2.0
+entropy_coefficient: 0.1
+adaptive: false
+feedback_mode: symmetric
+feedback_seed: 0
+feedback_lr: 0.05
+use_layernorm: true
+use_sparse_init: true
+sparsity: 0.9

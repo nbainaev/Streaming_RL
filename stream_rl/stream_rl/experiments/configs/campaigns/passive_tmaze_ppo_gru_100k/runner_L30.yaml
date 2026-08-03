@@ -1,0 +1,13 @@
+agent_config: ../../agents/ppo_gru.yaml
+env_config: env_L30.yaml
+scenario_config: null
+
+experiment_name: passive_tmaze_ppo_gru_100k
+run_id: L30
+log_root: logs/passive_tmaze_ppo_gru_100k
+total_timesteps: 100000
+log_every: 4992
+step_chunk: 1024
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1

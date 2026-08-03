@@ -1,0 +1,13 @@
+agent_config: ../agents/stream_ac_pretrained_frozen_ssm_phase_readout.yaml
+env_config: ../envs/tmaze_passive_curriculum.yaml
+scenario_config: null
+
+experiment_name: autoresearch_memory_classic_tmaze_l1
+run_id: stream_pretrained_frozen_ssm_phase_20k
+log_root: logs/autoresearch_memory_classic_tmaze_l1
+total_timesteps: 20000
+log_every: 1000
+step_chunk: 500
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

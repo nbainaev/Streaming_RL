@@ -29,6 +29,7 @@ from gymnax.environments import environment, spaces
 class TMazeParams:
     goal_reward: float = 1.0
     penalty: float = 0.0
+    oracle_reward: float = 0.0
 
 
 @struct.dataclass
@@ -152,10 +153,12 @@ class TMazeBase(environment.Environment[TMazeState, TMazeParams]):
         done = next_time_step >= self.episode_length
         success = next_y == state.goal_y
         lagging = next_x < (next_time_step - self.oracle_length)
+        first_oracle_visit = (next_x == 0) & (~state.oracle_visited)
         reward = jnp.where(
             done,
             jnp.where(success, params.goal_reward, 0.0),
-            jnp.where(lagging, params.penalty, 0.0),
+            jnp.where(lagging, params.penalty, 0.0)
+            + params.oracle_reward * first_oracle_visit.astype(jnp.float32),
         ).astype(jnp.float32)
         info = {
             "success": done & success,
@@ -177,6 +180,67 @@ class TMazeClassicPassive(TMazeBase):
             oracle_length=0,
             expose_goal=expose_goal,
         )
+
+
+class TMazePassiveForced(TMazeBase):
+    """Passive-memory diagnostic with forced corridor traversal.
+
+    The cue is visible only in the reset observation.  For the next
+    ``corridor_length`` steps the environment advances the agent along the
+    corridor and ignores its action.  At the junction, action 0 selects the
+    lower branch and action 1 the upper branch.  Consequently, the only
+    learnable decision is delayed binary recall: a memoryless policy scores
+    50% in expectation, while a working memory policy can score 100%.
+
+    This environment intentionally complements rather than replaces
+    ``TMazeClassicPassive``.  The classic environment also tests navigation
+    and sparse-credit assignment, which makes it unsuitable as an isolated
+    memory-module diagnostic.
+    """
+
+    def __init__(self, corridor_length: int = 10, expose_goal: bool = False):
+        super().__init__(
+            corridor_length=corridor_length,
+            oracle_length=0,
+            expose_goal=expose_goal,
+        )
+
+    @property
+    def default_params(self) -> TMazeParams:
+        return TMazeParams(penalty=0.0)
+
+    @property
+    def num_actions(self) -> int:
+        return 2
+
+    def step_env(self, key, state, action, params):
+        del key
+        action = jnp.asarray(action, dtype=jnp.int32)
+        at_junction = state.x >= self.junction_x
+
+        corridor_x = jnp.minimum(state.x + 1, self.junction_x)
+        branch_y = jnp.where(action == 0, -1, 1).astype(jnp.int32)
+        next_x = jnp.where(at_junction, state.x, corridor_x).astype(jnp.int32)
+        next_y = jnp.where(at_junction, branch_y, 0).astype(jnp.int32)
+        next_time_step = state.time_step + 1
+        next_state = TMazeState(
+            x=next_x,
+            y=next_y,
+            goal_y=state.goal_y,
+            oracle_visited=state.oracle_visited | (state.x == 0),
+            time_step=next_time_step,
+        )
+
+        done = at_junction
+        success = done & (next_y == state.goal_y)
+        reward = jnp.where(success, params.goal_reward, 0.0).astype(jnp.float32)
+        info = {
+            "success": success,
+            "goal_y": state.goal_y,
+            "x": next_x,
+            "y": next_y,
+        }
+        return self.get_obs(next_state, params), next_state, reward, done, info
 
 
 class TMazeClassicActive(TMazeBase):

@@ -1,0 +1,12 @@
+agent_config: ../agents/ctgraph_ppo_gru.yaml
+env_config: ../envs/ctgraph_lifelong_d2.yaml
+scenario_config: null
+
+experiment_name: ctgraph_lifelong_ppo
+log_root: logs/ctgraph_lifelong
+total_timesteps: 5000000
+log_every: 10240
+step_chunk: 2048
+checkpoint_every: 102400
+eval_every: -1
+eval_steps: -1

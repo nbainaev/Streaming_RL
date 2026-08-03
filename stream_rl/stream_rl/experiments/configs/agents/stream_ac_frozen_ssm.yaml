@@ -1,0 +1,44 @@
+name: stream_ac
+device: cpu
+
+# Exact online state update through a frozen SSM; only the actor/critic
+# linear readouts participate in TD(lambda)/ObGD updates.
+readout_only: true
+memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+
+gamma: 0.99
+trace_lambda: 0.9
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 0.2
+critic_kappa: 0.5
+entropy_coefficient: 0.01
+adaptive: false
+tbptt_steps: 1
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    # Optional genuine pretrained weights: NPZ with decay, B, C and D.
+    # checkpoint_path: /absolute/path/to/pretrained_ssm.npz
+    seed: 11
+    min_decay: 0.5
+    max_decay: 0.999
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    # checkpoint_path: /absolute/path/to/pretrained_ssm.npz
+    seed: 12
+    min_decay: 0.5
+    max_decay: 0.999
+  - type: fc
+    features: -1
+    init: sparse

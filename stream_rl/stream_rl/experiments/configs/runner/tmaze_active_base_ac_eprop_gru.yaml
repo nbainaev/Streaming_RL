@@ -1,4 +1,4 @@
-agent_config: ../agents/eprop_stream_ac.yaml
+agent_config: ../agents/eprop_stream_ac_random.yaml
 env_config: ../envs/tmaze_active.yaml
 scenario_config: null
 

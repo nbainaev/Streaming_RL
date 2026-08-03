@@ -1,0 +1,48 @@
+max_parallel: 2
+schedule: parallel
+work_dir: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy_frozen_jobs
+
+experiments:
+  - name: autoencode_easy_frozen_ssm
+    command: /Users/antany/Desktop/RL/memorax/.venv/bin/python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/popgym_easy_frozen_ssm.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.experiment_name: autoencode_easy_frozen_ssm
+      runner.log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy
+      runner.step_chunk: 512
+      env.env_id: popgym-AutoencodeEasy-v0
+      agent.trace_lambda: 0.98
+
+  - name: concentration_easy_frozen_ssm
+    command: /Users/antany/Desktop/RL/memorax/.venv/bin/python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/popgym_easy_frozen_ssm.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.experiment_name: concentration_easy_frozen_ssm
+      runner.log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy
+      runner.step_chunk: 512
+      env.env_id: popgym-ConcentrationEasy-v0
+      agent.trace_lambda: 0.95
+
+  - name: repeatfirst_easy_frozen_ssm
+    command: /Users/antany/Desktop/RL/memorax/.venv/bin/python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/popgym_easy_frozen_ssm.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.experiment_name: repeatfirst_easy_frozen_ssm
+      runner.log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy
+      runner.step_chunk: 512
+      env.env_id: popgym-RepeatFirstEasy-v0
+      agent.trace_lambda: 0.98
+
+  - name: battleship_easy_frozen_ssm
+    command: /Users/antany/Desktop/RL/memorax/.venv/bin/python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/popgym_easy_frozen_ssm.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.experiment_name: battleship_easy_frozen_ssm
+      runner.log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/logs/autoresearch_popgym_easy
+      runner.step_chunk: 512
+      env.env_id: popgym-BattleshipEasy-v0
+      agent.trace_lambda: 0.95

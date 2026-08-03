@@ -257,6 +257,8 @@ class ExperimentRunner:
         independent of log_every."""
         if self.agent_cfg['name'] == 'ppo':
             return self.agent_cfg['num_envs'] * self.agent_cfg['num_steps']
+        if self.agent_cfg['name'] == 'stream_tbptt':
+            return self.agent_cfg['num_envs'] * self.agent_cfg['tbptt_steps']
         return int(self.agent_cfg['num_envs'])
 
     def log_event(self, action: str, at_step: int, params: dict):
@@ -330,6 +332,13 @@ class ExperimentRunner:
                     'rebuild_agent=true with reset_state=false is unsafe because state structure '
                     'may no longer match the rebuilt agent.'
                 )
+        elif env_overrides:
+            # Algorithms retain the environment object internally.  Merely
+            # replacing runner.env leaves training bound to the old setup,
+            # making same-signature curricula silently ineffective.  Rebuild
+            # the stateless algorithm/network definitions against the new env
+            # while preserving the complete online learning state.
+            self.agent = self.build_agent(self.env, self.env_params)
 
     def build_env_from_cfg(self, env_cfg: dict, agent_cfg: dict):
         from stream_rl.src.env.factory import make_env
@@ -362,6 +371,9 @@ class ExperimentRunner:
         trajectory (only how often results are written out)."""
         import jax
         import lox
+        from stream_rl.src.utils.lox_compat import patch_lox_scan_metadata
+
+        patch_lox_scan_metadata()
 
         step_start = self.step
         train_mode = not self.frozen
@@ -412,6 +424,11 @@ class ExperimentRunner:
         # doesn't) — only logged when present, so the CSV schema stays
         # consistent for envs that never emit it.
         success = np.asarray(info['success']).reshape(-1, num_envs) if 'success' in info else None
+        optional_episode_fields = {
+            key: np.asarray(info[key]).reshape(-1, num_envs)
+            for key in ('path_score', 'reward_phase', 'reward_switched')
+            if key in info
+        }
 
         t_idx, env_idx = np.nonzero(done)
         if len(t_idx) == 0:
@@ -428,6 +445,8 @@ class ExperimentRunner:
             }
             if success is not None:
                 episode_info['success'] = float(success[t, e])
+            for key, values in optional_episode_fields.items():
+                episode_info[key] = float(values[t, e])
             self.monitor_logger.log(
                 {
                     'episode_idx': int(self.episode_idx),
@@ -540,6 +559,9 @@ class ExperimentRunner:
     def run_chunk(self, chunk: int, train: bool):
         import jax
         import lox
+        from stream_rl.src.utils.lox_compat import patch_lox_scan_metadata
+
+        patch_lox_scan_metadata()
 
         runner_fn = self.agent.train if train else self.agent.evaluate
         chunk_fn = lox.spool(runner_fn)

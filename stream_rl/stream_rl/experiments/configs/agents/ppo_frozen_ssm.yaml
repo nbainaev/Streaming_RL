@@ -1,0 +1,46 @@
+name: ppo
+device: cpu
+
+# Frozen observation projection + frozen structured SSM.  The only Flax
+# parameters are the final actor and critic projections.
+readout_only: true
+memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+num_steps: 128
+gamma: 0.99
+gae_lambda: 0.95
+num_minibatches: 1
+update_epochs: 4
+normalize_advantage: true
+clip_coefficient: 0.2
+clip_value_loss: true
+entropy_coefficient: 0.01
+actor_lr: 7.0e-4
+critic_lr: 7.0e-4
+max_grad_norm: 0.5
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    # Optional genuine pretrained weights: NPZ with decay, B, C and D.
+    # checkpoint_path: /absolute/path/to/pretrained_ssm.npz
+    seed: 11
+    min_decay: 0.5
+    max_decay: 0.999
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    # checkpoint_path: /absolute/path/to/pretrained_ssm.npz
+    seed: 12
+    min_decay: 0.5
+    max_decay: 0.999
+  - type: fc
+    features: -1
+    init: sparse

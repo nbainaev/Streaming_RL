@@ -75,12 +75,23 @@ register_pytree_node(EpropCarry, _flatten_eprop_carry, _unflatten_eprop_carry)
 
 
 def _epropcarry_to_state_dict(carry: "EpropCarry") -> dict:
-    return {"h": carry.h, "traces": carry.traces}
+    # Flax's msgpack encoder does not accept a bare Python tuple inside a
+    # custom serialization handler.  Store LSTM (c, h) as a keyed mapping;
+    # the target object supplied to from_bytes tells us whether to rebuild a
+    # tuple or retain the single GRU/RNN array.
+    hidden = (
+        {"cell": carry.h[0], "hidden": carry.h[1]}
+        if isinstance(carry.h, tuple)
+        else carry.h
+    )
+    return {"h": hidden, "traces": carry.traces}
 
 
 def _epropcarry_from_state_dict(carry: "EpropCarry", state_dict: dict) -> "EpropCarry":
     h = state_dict["h"]
-    return EpropCarry(h=tuple(h) if isinstance(carry.h, tuple) else h, traces=dict(state_dict["traces"]))
+    if isinstance(carry.h, tuple):
+        h = (h["cell"], h["hidden"])
+    return EpropCarry(h=h, traces=dict(state_dict["traces"]))
 
 
 # JAX pytree registration (above) lets EpropCarry flow through jax.lax.scan /
@@ -248,23 +259,32 @@ class GRU(_BaseEpropCell):
         # forget_bias does.
         h = (1.0 - z) * n + z * h_prev
 
+        # Each eligibility must be a derivative of the *cell output h*, not
+        # merely a derivative of the corresponding gate.  Broadcasting a
+        # dL/dh learning signal through bare dz/dr/dn (the previous
+        # implementation) drops the chain-rule factors below and gives an
+        # incorrectly scaled -- and for the update gate often incorrectly
+        # signed -- recurrent update.
         dz = z * (1.0 - z)
         dr = r * (1.0 - r)
         dn = self._act_deriv(n_pre, n)
-        r_dn = r * dn  # n's recurrent-path sensitivity is gated by r too
+        z_sensitivity = (h_prev - n) * dz
+        n_sensitivity = (1.0 - z) * dn
+        r_sensitivity = n_sensitivity * hn_pre * dr
+        recurrent_n_sensitivity = n_sensitivity * r
 
         decay = self.trace_decay
         traces = {
-            "e_wz": decay * carry.traces["e_wz"] + jnp.einsum("bi,bj->bij", x, dz),
-            "e_wr": decay * carry.traces["e_wr"] + jnp.einsum("bi,bj->bij", x, dr),
-            "e_wn": decay * carry.traces["e_wn"] + jnp.einsum("bi,bj->bij", x, dn),
-            "e_uz": decay * carry.traces["e_uz"] + jnp.einsum("bi,bj->bij", h_prev, dz),
-            "e_ur": decay * carry.traces["e_ur"] + jnp.einsum("bi,bj->bij", h_prev, dr),
-            "e_un": decay * carry.traces["e_un"] + jnp.einsum("bi,bj->bij", h_prev, r_dn),
-            "e_bz": decay * carry.traces["e_bz"] + dz,
-            "e_br": decay * carry.traces["e_br"] + dr,
-            "e_bn": decay * carry.traces["e_bn"] + dn,
-            "e_bhn": decay * carry.traces["e_bhn"] + r_dn,
+            "e_wz": decay * carry.traces["e_wz"] + jnp.einsum("bi,bj->bij", x, z_sensitivity),
+            "e_wr": decay * carry.traces["e_wr"] + jnp.einsum("bi,bj->bij", x, r_sensitivity),
+            "e_wn": decay * carry.traces["e_wn"] + jnp.einsum("bi,bj->bij", x, n_sensitivity),
+            "e_uz": decay * carry.traces["e_uz"] + jnp.einsum("bi,bj->bij", h_prev, z_sensitivity),
+            "e_ur": decay * carry.traces["e_ur"] + jnp.einsum("bi,bj->bij", h_prev, r_sensitivity),
+            "e_un": decay * carry.traces["e_un"] + jnp.einsum("bi,bj->bij", h_prev, recurrent_n_sensitivity),
+            "e_bz": decay * carry.traces["e_bz"] + z_sensitivity,
+            "e_br": decay * carry.traces["e_br"] + r_sensitivity,
+            "e_bn": decay * carry.traces["e_bn"] + n_sensitivity,
+            "e_bhn": decay * carry.traces["e_bhn"] + recurrent_n_sensitivity,
         }
         return EpropCarry(h=h, traces=traces), self._maybe_layernorm(h)
 
@@ -329,10 +349,17 @@ class LSTM(_BaseEpropCell):
         # all (only h_t = o_t*tanh(c_t) directly), so its "trace" is really
         # instantaneous — decaying it too is a harmless simplification for
         # implementation uniformity.
-        di_g = (i * (1.0 - i)) * g
-        df_c = (f * (1.0 - f)) * c_prev
-        i_dg = i * self._act_deriv(g_pre, g)
-        do_tanh_c = (o * (1.0 - o)) * jnp.tanh(c)
+        # The learning signal consumed by StreamEprop is dL/dh.  Therefore
+        # all gate traces must also describe dh/dtheta.  The previous code
+        # stored dc/dtheta for i/f/g but dh/dtheta for o, then multiplied all
+        # four by the same learning signal.  Apply dh/dc here so the trace
+        # dictionary has one consistent meaning.
+        tanh_c = jnp.tanh(c)
+        dh_dc = o * (1.0 - tanh_c**2)
+        di_g = dh_dc * (i * (1.0 - i)) * g
+        df_c = dh_dc * (f * (1.0 - f)) * c_prev
+        i_dg = dh_dc * i * self._act_deriv(g_pre, g)
+        do_tanh_c = (o * (1.0 - o)) * tanh_c
 
         decay = self.trace_decay
         traces = {

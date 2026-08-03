@@ -1,0 +1,12 @@
+experiment_name: memory_benchmark_2026_08_03
+run_id: full__passive__L10__ac_rtu_rtrl_bptt1__frozen_ssm
+agent_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/passive/L10/ac_rtu_rtrl_bptt1/frozen_ssm/agent.yaml
+env_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/passive/L10/ac_rtu_rtrl_bptt1/frozen_ssm/env.yaml
+log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03
+total_timesteps: 100000
+step_chunk: 5000
+log_every: 5000
+checkpoint_every: 25000
+eval_every: -1
+scenario:
+  type: none

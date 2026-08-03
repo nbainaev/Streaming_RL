@@ -23,9 +23,13 @@ entropy_coefficient: 0.01
 adaptive: true           # ObGD's Adam-like (v_hat) step-size normalization
 
 # "Connectivity matrix" for the learning signal broadcast into the
-# recurrent layer: symmetric (exact, via the real readout weights) |
+# recurrent layer: symmetric (current readout Jacobian; temporal route is approximate) |
 # random (fixed random feedback, Bellec et al.'s random e-prop) |
 # adaptive (random, slowly nudged toward the readout weights).
 feedback_mode: symmetric
 feedback_seed: 0
 feedback_lr: 0.05          # only used when feedback_mode == adaptive
+
+use_layernorm: true
+use_sparse_init: true
+sparsity: 0.9

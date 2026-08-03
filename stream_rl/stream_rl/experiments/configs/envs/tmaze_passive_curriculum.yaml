@@ -1,0 +1,5 @@
+namespace: tmaze
+env_id: tmaze_passive
+kwargs:
+  corridor_length: 1
+  goal_reward: 1.0

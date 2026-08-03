@@ -1,0 +1,50 @@
+name: stream_ac
+device: cpu
+
+# The projection and pretrained SSM are fixed; RTU-RTRL and the readouts learn.
+readout_only: false
+frozen_encoder: true
+memory_seed: 220512258
+critic_memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+gamma: 0.99
+trace_lambda: 0.97
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 0.2
+critic_kappa: 0.5
+entropy_coefficient: 0.01
+adaptive: false
+direct_entropy_update: false
+tbptt_steps: 1
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: rnn
+    cell: rtu_rtrl
+    features: 64
+    r_max: 0.99
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: rnn
+    cell: rtu_rtrl
+    features: 64
+    r_max: 0.99
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse

@@ -6,7 +6,11 @@ from stream_rl.src.env.tmaze import (
     TMazeBase,
     TMazeClassicActive,
     TMazeClassicPassive,
+    TMazePassiveForced,
 )
+from stream_rl.src.env.ctgraph import CTGraph
+from stream_rl.src.env.continuing_statistics import RecordContinuingEpisodeStatistics
+from stream_rl.src.env.delayed_cue import DelayedCue
 
 
 def _make_tmaze_env(cfg: dict):
@@ -18,9 +22,12 @@ def _make_tmaze_env(cfg: dict):
     # live on TMazeParams, not on the env instance.
     goal_reward = kwargs.pop("goal_reward", None)
     penalty = kwargs.pop("penalty", None)
+    oracle_reward = kwargs.pop("oracle_reward", None)
 
     if env_id == "tmaze_passive":
         env = TMazeClassicPassive(**kwargs)
+    elif env_id == "tmaze_passive_forced":
+        env = TMazePassiveForced(**kwargs)
     elif env_id == "tmaze_active":
         env = TMazeClassicActive(**kwargs)
     elif env_id == "tmaze_base":
@@ -28,7 +35,8 @@ def _make_tmaze_env(cfg: dict):
     else:
         raise ValueError(
             f"Unknown tmaze env_id={env_id!r}. "
-            "Expected one of: 'tmaze_base', 'tmaze_passive', 'tmaze_active'."
+            "Expected one of: 'tmaze_base', 'tmaze_passive', "
+            "'tmaze_passive_forced', 'tmaze_active'."
         )
 
     env_params = env.default_params
@@ -36,6 +44,8 @@ def _make_tmaze_env(cfg: dict):
         env_params = env_params.replace(goal_reward=float(goal_reward))
     if penalty is not None:
         env_params = env_params.replace(penalty=float(penalty))
+    if oracle_reward is not None:
+        env_params = env_params.replace(oracle_reward=float(oracle_reward))
     return env, env_params
 
 
@@ -44,6 +54,29 @@ def make_env(cfg: dict, num_envs: int):
 
     if namespace == "tmaze":
         env, env_params = _make_tmaze_env(cfg)
+        env = RecordEpisodeStatistics(env)
+        return env, env_params
+
+    if namespace == "ctgraph":
+        kwargs = dict(cfg.get("kwargs", {}))
+        high_reward = float(kwargs.pop("high_reward", 1.0))
+        fail_reward = float(kwargs.pop("fail_reward", -1.0))
+        env = CTGraph(**kwargs)
+        env_params = env.default_params.replace(
+            high_reward=high_reward, fail_reward=fail_reward
+        )
+        env = (
+            RecordContinuingEpisodeStatistics(env)
+            if env.continuing_task
+            else RecordEpisodeStatistics(env)
+        )
+        return env, env_params
+
+    if namespace == "delayed_cue":
+        kwargs = dict(cfg.get("kwargs", {}))
+        correct_reward = float(kwargs.pop("correct_reward", 1.0))
+        env = DelayedCue(**kwargs)
+        env_params = env.default_params.replace(correct_reward=correct_reward)
         env = RecordEpisodeStatistics(env)
         return env, env_params
 

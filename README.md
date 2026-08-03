@@ -1,110 +1,158 @@
-# Passive T-Maze
+# Streaming RL: recurrent agents and memory benchmarks
 
-JAX/Gymnax-реализация среды Passive T-Maze для экспериментов с памятью и
-генерализацией по длине коридора.
+Исследовательский код для сравнения потоковых и батчевых алгоритмов обучения
+с подкреплением в задачах, где агенту требуется долговременная память.
+Репозиторий объединяет реализации PPO, Streaming Actor-Critic, e-prop и
+оконного TBPTT, конфигурации воспроизводимых экспериментов и тесты корректности
+рекуррентных градиентов.
 
-## Постановка
+## Возможности
 
-В начале эпизода агент один раз наблюдает положение цели
-`G ∈ {-1, +1}`. Затем сигнал исчезает: агент должен пройти по коридору вправо,
-сохранить знак цели во внутреннем состоянии и на Т-развилке выбрать нужный
-рукав.
+- агенты `ppo`, `stream_ac`, `stream_eprop` и `stream_tbptt`;
+- Vanilla RNN, GRU, LSTM и RTU/RTRL-блоки;
+- symmetric, random и adaptive feedback для e-prop;
+- замороженная или предобученная state-space memory с обучаемыми readout-слоями;
+- auxiliary-cue objective и варианты без memory readout;
+- одиночные запуски, сетки гиперпараметров, несколько seed и сценарии смены среды;
+- контрольные среды Passive/Active T-Maze, forced Passive T-Maze, Delayed Cue,
+  lifelong CT-graph и задачи POPGym;
+- логирование, checkpointing, оценка замороженной политики и аналитические
+  скрипты для исследования скрытых представлений.
 
-| Элемент | Значение |
-|---|---|
-| Длина коридора | `L = corridor_length` |
-| Горизонт | `L + 1` переход |
-| Действия | `0`: вправо, `1`: вверх, `2`: влево, `3`: вниз |
-| Начальное наблюдение | `(0, G)` |
-| Наблюдение внутри коридора | `(0, 0)` |
-| Наблюдение на развилке | `(1, 0)` |
-| Правильный финальный выбор | награда `+1`, `success=True` |
-| Неправильный финальный выбор | награда `0` |
-| Отставание от пассивного движения | штраф `-1/L` за промежуточный шаг |
-
-Награда соответствует определению Passive T-Maze из статьи:
+## Структура
 
 ```text
-r_t = (1[x_(t+1) >= t] - 1) / L
-r_terminal = 1[o_(T+1) = G]
+stream_rl/
+├── main.py                         # одиночный запуск
+├── pyproject.toml                  # зависимости проекта
+└── stream_rl/
+    ├── experiments/
+    │   ├── configs/
+    │   │   ├── agents/             # алгоритм и архитектура
+    │   │   ├── envs/               # среда и её параметры
+    │   │   ├── runner/             # бюджет, логирование и ссылки на конфиги
+    │   │   ├── experiments/        # сетки и многосидовые кампании
+    │   │   └── scenario/           # последовательные фазы эксперимента
+    │   └── runners/                # исполнители одиночных и пакетных запусков
+    ├── src/
+    │   ├── agents/                 # PPO/StreamAC/e-prop/TBPTT
+    │   ├── env/                    # JAX-среды и обёртки
+    │   ├── models/                 # рекуррентные и memory-блоки
+    │   └── utils/
+    └── test/                       # проверки алгоритмов и сред
 ```
 
-Оптимальная политика движется вправо `L` шагов, а затем выбирает цель и
-получает return `1.0`. Политика без памяти может только угадать положение
-цели, поэтому её ожидаемый return равен `0.5`. Постоянное отставание даёт
-суммарный return `-1.0`.
+## Установка
 
-## Параметры
-
-Код среды расположен в
-[`experiments/task2/envs/passive_tmaze.py`](experiments/task2/envs/passive_tmaze.py).
-
-```python
-from experiments.task2.envs import PassiveTMaze
-
-env = PassiveTMaze(
-    corridor_length=5,
-    expose_goal=False,
-)
-params = env.default_params
-```
-
-- `corridor_length` задаёт длину `L`;
-- `expose_goal=False` включает исходную частично наблюдаемую задачу;
-- `expose_goal=True` добавляет `G` к каждому наблюдению и используется как
-  Markov control;
-- `params.goal_reward` задаёт награду за правильный рукав;
-- `params.penalty` по умолчанию равен `-1/L`.
-
-## Состояние и наблюдение
-
-Внутреннее состояние симулятора содержит:
-
-```text
-x         — положение вдоль коридора, 0 ... L
-y         — выбранный рукав: -1, 0 или +1
-goal_y    — скрытая цель G
-time_step — номер перехода
-```
-
-Агент не получает `goal_y` после первого наблюдения. Полное состояние нужно
-только самой среде и, при явно выбранном протоколе, privileged critic.
-
-## Быстрая проверка
-
-Минимальные зависимости:
+Требуется Python 3.12. Рекомендуемый менеджер окружения —
+[uv](https://docs.astral.sh/uv/).
 
 ```bash
-pip install "jax>=0.7.0" "flax>=0.10.2" "gymnax>=0.0.9"
+cd stream_rl
+uv sync
 ```
 
-Пример одного эпизода:
+Файл `uv.lock` фиксирует версии зависимостей. Пакеты `memorax` и `lox`
+подключаются из закреплённых Git-ревизий. Для GPU следует отдельно проверить
+совместимость установленного JAX с CUDA на целевой машине.
 
-```python
-import jax
+## Быстрый старт
 
-key = jax.random.key(0)
-observation, state = env.reset(key, params)
+Одиночный запуск по готовому runner-конфигу:
 
-for action in [0] * 5 + [1]:
-    key, step_key = jax.random.split(key)
-    observation, state, reward, done, info = env.step(
-        step_key, state, action, params
-    )
+```bash
+cd stream_rl
+uv run python main.py \
+  --config stream_rl/experiments/configs/runner/tmaze_passive_stream_rtu_rtrl_20k.yaml \
+  --seed 0
 ```
 
-При работе через `env.step` Gymnax автоматически сбрасывает состояние после
-терминального перехода. Поле `info["success"]` относится к только что
-завершённому эпизоду.
+Runner-конфиг связывает три уровня настроек:
 
-## Протокол общей проверки
+```yaml
+agent_config: ../agents/stream_ac_rtu_rtrl.yaml
+env_config: ../envs/tmaze_passive.yaml
+scenario_config: null
 
-Рекомендуемый общий набор длин:
-
-```text
-train: L = 5
-validation: L = 2, 3, 5, 10, 15, 30, 50
+experiment_name: autoresearch_memory_classic_tmaze
+log_root: logs/autoresearch_memory_classic_tmaze
+total_timesteps: 20000
+log_every: 4000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
 ```
 
-Обучение проводится только на выбранной `train`-длине. При валидации параметры
-политики замораживаются, меняется лишь `corridor_length`.
+Относительные пути разрешаются от файла runner-конфига. Результаты записываются
+в указанный `log_root`; сгенерированные логи и checkpoints намеренно не
+версионируются.
+
+## Пакетные эксперименты
+
+Meta-конфиги из `experiments/configs/experiments/` задают seed, переопределения,
+сетки параметров и последовательный либо параллельный режим запуска.
+
+Сначала рекомендуется проверить материализацию команд:
+
+```bash
+cd stream_rl
+uv run python -m stream_rl.experiments.runners.runner \
+  --meta-config stream_rl/experiments/configs/experiments/ctgraph_lifelong_pilot.yaml \
+  --dry-run
+```
+
+Для фактического запуска удалите `--dry-run`.
+
+## Семантика конфигов
+
+| Каталог | Назначение |
+|---|---|
+| `configs/agents` | алгоритм, оптимизация, recurrent cell, размер состояния и memory-режим |
+| `configs/envs` | namespace среды, `env_id` и аргументы конструктора |
+| `configs/runner` | бюджет, интервалы логирования/оценки/checkpoint и ссылки на остальные конфиги |
+| `configs/experiments` | наборы запусков, seed, grid/overrides и параллелизм |
+| `configs/scenario` | фазы curriculum, заморозка параметров и замена среды |
+| `configs/campaigns` | полностью материализованные конфиги воспроизводимых кампаний |
+
+Поддерживаемые пространства задач:
+
+- `tmaze`: base, active, passive и forced-passive варианты;
+- `delayed_cue`: разреженная, плотная и шумная отложенная подсказка;
+- `ctgraph`: стационарные и lifelong-варианты со сменой целевой ветви;
+- `popgym`: memory-бенчмарки, включая Tuple observations и MultiDiscrete actions;
+- среды из `memorax` через соответствующий namespace.
+
+## Проверки
+
+```bash
+cd stream_rl
+uv run pytest stream_rl/test
+```
+
+Набор тестов проверяет:
+
+- локальные eligibility traces RNN/GRU/LSTM относительно JAX autodiff;
+- сброс recurrent state и traces между эпизодами;
+- режимы feedback и воспроизводимость `feedback_seed`;
+- RTU/RTRL и frozen-memory архитектуры;
+- T-Maze, Delayed Cue, CT-graph и POPGym wrappers;
+- совместимость scan-метаданных `lox` с текущим JAX.
+
+## Воспроизводимость
+
+Для публикуемого результата сохраняйте runner-, agent- и env-конфиги вместе с
+seed и Git commit. Исполнитель автоматически материализует конфиги в каталог
+запуска. Сравнение алгоритмов следует проводить при одинаковом числе переходов,
+нескольких seed и заранее заданном критерии агрегации.
+
+## Текущий исследовательский статус
+
+Реализации и диагностические тесты предназначены для исследовательских
+экспериментов. Короткие пилоты на T-Maze и POPGym не подтверждают устойчивого
+преимущества streaming/e-prop над контрольными алгоритмами; выводы требуют
+полных бюджетов, 5–10 seed и доверительных интервалов.
+
+## Лицензия
+
+Отдельный файл лицензии в репозитории пока отсутствует. До его добавления код
+не следует считать открыто лицензированным для повторного распространения.

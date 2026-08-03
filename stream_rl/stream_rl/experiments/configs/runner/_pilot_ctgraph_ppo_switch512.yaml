@@ -1,0 +1,11 @@
+agent_config: ../agents/ctgraph_ppo_gru.yaml
+env_config: ../envs/ctgraph_lifelong_d2_switch512.yaml
+scenario_config: null
+experiment_name: pilot_ctgraph_ppo_switch512
+log_root: logs/pilot_validation
+total_timesteps: 20480
+log_every: 4096
+step_chunk: 2048
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

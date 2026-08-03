@@ -1,0 +1,13 @@
+agent_config: ../agents/ppo_gru.yaml
+env_config: ../envs/tmaze_passive_forced.yaml
+scenario_config: null
+
+experiment_name: pretrained_frozen_memory_forced_tmaze
+run_id: ppo_gru
+log_root: logs/pretrained_frozen_memory_forced_tmaze
+total_timesteps: 10000
+log_every: 1536
+step_chunk: 1024
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

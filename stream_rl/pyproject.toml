@@ -1,7 +1,7 @@
 [project]
 name = "stream-rl"
 version = "0.1.0"
-description = "Add your description here"
+description = "Streaming and recurrent reinforcement learning for long-term memory benchmarks"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,6 +10,7 @@ dependencies = [
     "memorax",
     "numpy>=2.5.1",
     "popgym>=1.0.7",
+    "pyyaml>=6.0.3",
     "rl-zoo3>=2.9.1",
     "streamlit>=1.60.0",
     "torch==2.10.0",
