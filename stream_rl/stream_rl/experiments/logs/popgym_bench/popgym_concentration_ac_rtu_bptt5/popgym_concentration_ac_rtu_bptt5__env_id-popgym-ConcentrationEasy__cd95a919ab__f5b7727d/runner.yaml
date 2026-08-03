@@ -1,0 +1,13 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_concentration_bench/popgym_concentration_ac_rtu_bptt5/popgym_concentration_ac_rtu_bptt5__env_id-popgym-ConcentrationEasy__cd95a919ab__f5b7727d/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_concentration_bench/popgym_concentration_ac_rtu_bptt5/popgym_concentration_ac_rtu_bptt5__env_id-popgym-ConcentrationEasy__cd95a919ab__f5b7727d/env.yaml
+scenario_config: null
+experiment_name: popgym_concentration_ac_rtu_bptt5
+log_root: logs/popgym_bench
+total_timesteps: 170000
+log_every: 5000
+step_chunk: 1000
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1
+variant_name: popgym_concentration_ac_rtu_bptt5__env_id=popgym-ConcentrationEasy
+run_id: popgym_concentration_ac_rtu_bptt5__env_id-popgym-ConcentrationEasy__cd95a919ab__f5b7727d

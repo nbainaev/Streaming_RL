@@ -1,0 +1,11 @@
+agent_config: ../agents/ctgraph_stream_eprop_gru.yaml
+env_config: ../envs/ctgraph_lifelong_d2.yaml
+scenario_config: null
+experiment_name: pilot_ctgraph_stream_eprop
+log_root: logs/pilot_validation
+total_timesteps: 20000
+log_every: 4000
+step_chunk: 2000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

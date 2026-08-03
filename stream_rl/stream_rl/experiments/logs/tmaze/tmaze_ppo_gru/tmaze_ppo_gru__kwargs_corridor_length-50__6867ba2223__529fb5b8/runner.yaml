@@ -1,0 +1,12 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner/tmaze_ppo_gru/tmaze_ppo_gru__kwargs_corridor_length-50__6867ba2223__529fb5b8/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner/tmaze_ppo_gru/tmaze_ppo_gru__kwargs_corridor_length-50__6867ba2223__529fb5b8/env.yaml
+scenario_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/scenario/tmaze_freeze.yaml
+experiment_name: tmaze_ppo_gru
+log_root: logs/tmaze
+total_timesteps: 7000
+log_every: 200
+checkpoint_every: 1500
+eval_every: -1
+eval_steps: -1
+variant_name: tmaze_ppo_gru__kwargs_corridor_length=50
+run_id: tmaze_ppo_gru__kwargs_corridor_length-50__6867ba2223__529fb5b8

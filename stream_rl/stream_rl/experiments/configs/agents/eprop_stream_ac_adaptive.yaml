@@ -1,0 +1,27 @@
+name: stream_eprop
+device: cpu
+
+num_envs: 1
+embed_dim: 64
+hidden_size: 64
+cell: eprop_gru
+activation: tanh
+
+gamma: 0.99
+trace_decay: 0.9
+trace_lambda: 0.9
+
+actor_lr: 0.5
+critic_lr: 0.5
+actor_kappa: 2.0
+critic_kappa: 3.0
+
+entropy_coefficient: 0.02
+adaptive: false
+
+# Random feedback matrix, slowly nudged toward the true readout weights
+# (EMA with rate feedback_lr) — interpolates between "random" and
+# "symmetric" feedback.
+feedback_mode: adaptive
+feedback_seed: 0
+feedback_lr: 0.1

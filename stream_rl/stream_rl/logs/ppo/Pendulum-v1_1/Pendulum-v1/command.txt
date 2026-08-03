@@ -1,0 +1,1 @@
+python -m rl_zoo3.train --algo ppo --env Pendulum-v1 --eval-freq 10000 -f logs/ --device cpu

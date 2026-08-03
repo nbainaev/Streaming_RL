@@ -1,0 +1,13 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_repeatprevious_bench/popgym_repeatprevious_ppo_gru/popgym_repeatprevious_ppo_gru__env_id-popgym-RepeatPreviousEasy__f964dbfe4d__fc5d4406/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_popgym_repeatprevious_bench/popgym_repeatprevious_ppo_gru/popgym_repeatprevious_ppo_gru__env_id-popgym-RepeatPreviousEasy__f964dbfe4d__fc5d4406/env.yaml
+scenario_config: null
+experiment_name: popgym_repeatprevious_ppo_gru
+log_root: logs/popgym_bench
+total_timesteps: 300000
+log_every: 5000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1
+variant_name: popgym_repeatprevious_ppo_gru__env_id=popgym-RepeatPreviousEasy
+run_id: popgym_repeatprevious_ppo_gru__env_id-popgym-RepeatPreviousEasy__f964dbfe4d__fc5d4406

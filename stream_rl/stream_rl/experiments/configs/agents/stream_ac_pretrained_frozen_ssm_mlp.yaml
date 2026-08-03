@@ -1,0 +1,47 @@
+name: stream_ac
+device: cpu
+
+# Frozen pretrained history compressor; only the small downstream MLP is
+# trained online.  This remains one-transition streaming learning.
+readout_only: false
+frozen_encoder: true
+memory_seed: 220512258
+critic_memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+gamma: 0.99
+trace_lambda: 0.9
+actor_lr: 0.1
+critic_lr: 0.3
+actor_kappa: 3.0
+critic_kappa: 2.0
+entropy_coefficient: 0.003
+adaptive: false
+direct_entropy_update: true
+tbptt_steps: 1
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: fc
+    features: 32
+    activation: tanh
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: fc
+    features: 32
+    activation: tanh
+  - type: fc
+    features: -1
+    init: sparse

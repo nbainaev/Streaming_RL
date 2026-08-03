@@ -1,0 +1,12 @@
+agent_config: ../agents/latent_delayed_cue_lstm.yaml
+env_config: ../envs/delayed_cue_dense_d5.yaml
+scenario_config: null
+
+experiment_name: latent_delayed_cue_dense_lstm
+log_root: logs/latent_analysis
+total_timesteps: 100000
+log_every: 10000
+step_chunk: 4000
+checkpoint_every: 20000
+eval_every: -1
+eval_steps: -1

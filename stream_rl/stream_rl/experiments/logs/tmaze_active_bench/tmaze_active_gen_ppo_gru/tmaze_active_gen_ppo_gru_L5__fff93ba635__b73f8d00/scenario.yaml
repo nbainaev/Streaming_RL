@@ -1,0 +1,47 @@
+# Auto-generated for corridor_length=5 by
+# gen_tmaze_gen_configs.py -- freeze/eval trigger steps are scaled to
+# this training leg's length (24000 steps = 3000 episodes
+# at this corridor_length's episode_length), so every corridor_length in
+# the grid gets the same number of training episodes before eval.
+#
+# Timeline (total_timesteps must be 49000):
+#   0 - 24000: train at corridor_length=5
+#   24000 - 29000: eval @ 100
+#   29000 - 34000: eval @ 300
+#   34000 - 39000: eval @ 500
+#   39000 - 44000: eval @ 700
+#   44000 - 49000: eval @ 1000
+type: event
+events:
+  - at_step: 24000
+    action: freeze_agent
+  - at_step: 24000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 100
+  - at_step: 29000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 300
+  - at_step: 34000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 500
+  - at_step: 39000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 700
+  - at_step: 44000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 1000

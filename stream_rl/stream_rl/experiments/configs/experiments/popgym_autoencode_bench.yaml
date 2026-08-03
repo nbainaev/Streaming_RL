@@ -1,0 +1,114 @@
+# Benchmark sweep: all recurrent-core variants on popgym-Autoencode across
+# its Easy/Medium/Hard difficulty variants. Run with:
+#   uv run runners/runner.py --meta-config ../experiments/popgym_autoencode_bench.yaml
+#
+# Mirrors tmaze_active_bench.yaml's structure/gamma-defaults but grids over
+# env.env_id (difficulty) instead of corridor_length.
+#
+# trace_lambda=0.98 (up from the shared agent default of 0.9) is an
+# Autoencode-specific override: reward here only appears in the second half
+# of the episode (the "recite" phase), so the eligibility trace has to carry
+# credit back to the "watch" phase where the relevant card was encoded -- up
+# to ~half the episode length (52/104/156 steps for Easy/Medium/Hard). At
+# gamma*lambda=0.891 (the old 0.9 default) that trace decays to ~0 within
+# ~40 steps, i.e. strictly shorter than the gap Autoencode requires, which
+# is consistent with every architecture here (AC and PPO alike) scoring at
+# exactly the -0.5-ish random-policy baseline in the original benchmark run.
+# 0.98 -> gamma*lambda=0.9702, keeping ~13% of the signal at 100 steps.
+# Note: this task may still need a training-step budget well beyond 300k to
+# show clear separation between architectures -- POPGym's own benchmark
+# treats Autoencode as one of the hardest tasks in the suite.
+max_parallel: 1
+schedule: parallel
+work_dir: .exp_runner_popgym_autoencode_bench
+
+experiments:
+  - name: popgym_autoencode_ppo_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ppo_gru
+      env.namespace: popgym
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_gru_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_gru_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_rtu_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_rtu_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_gru_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_gru_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_rtu_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_rtu_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_rtu_rtrl
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_rtu_rtrl
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_eprop_rnn
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_eprop_rnn
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+
+  - name: popgym_autoencode_ac_eprop_gru_symmetric
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_autoencode_ac_eprop_gru_symmetric
+      env.namespace: popgym
+      agent.trace_lambda: 0.98
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-AutoencodeEasy, popgym-AutoencodeMedium, popgym-AutoencodeHard]
+

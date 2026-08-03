@@ -1,0 +1,8 @@
+seeds: [0, 1, 2]
+experiment_name: stream_ac_cartpole
+total_timesteps: 100000
+log_root: logs
+log_every: 10000
+checkpoint_every: 50000
+eval_every: 10000
+eval_steps: 5000

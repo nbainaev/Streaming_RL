@@ -1,0 +1,11 @@
+namespace: ctgraph
+env_id: ctgraph_lifelong
+kwargs:
+  depth: 2
+  branching: 2
+  reward_switch_steps: 512
+  continuing_task: true
+  reward_distribution: linear
+  reward_seed: 0
+  high_reward: 1.0
+  fail_reward: -1.0

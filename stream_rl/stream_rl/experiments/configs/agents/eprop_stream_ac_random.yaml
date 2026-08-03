@@ -1,0 +1,27 @@
+name: stream_eprop
+device: cpu
+
+num_envs: 1
+embed_dim: 64
+hidden_size: 64
+cell: eprop_gru
+activation: tanh
+
+gamma: 0.99
+trace_decay: 0.9
+trace_lambda: 0.9
+
+actor_lr: 0.5
+critic_lr: 0.5
+actor_kappa: 2.0
+critic_kappa: 3.0
+
+entropy_coefficient: 0.02
+adaptive: false
+
+# Random feedback-alignment e-prop (Bellec et al.): the learning signal is
+# broadcast into the recurrent layer through a fixed random matrix instead
+# of the true readout weights. Learns markedly slower/weaker than
+# feedback_mode=symmetric on memory-heavy tasks — see eprop_stream_ac.yaml.
+feedback_mode: random
+feedback_seed: 0

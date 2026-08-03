@@ -1,0 +1,13 @@
+agent_config: ../agents/stream_ac_gru_bptt1.yaml
+env_config: ../envs/tmaze_passive.yaml
+scenario_config: null
+
+experiment_name: frozen_memory_passive_tmaze
+run_id: stream_ac_gru_control
+log_root: logs/frozen_memory_passive_tmaze
+total_timesteps: 20000
+log_every: 3000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

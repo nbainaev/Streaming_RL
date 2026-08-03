@@ -1,0 +1,49 @@
+{
+  "env_config": {
+    "namespace": "tmaze",
+    "env_id": "tmaze_passive",
+    "kwargs": {
+      "corridor_length": 20,
+      "goal_reward": 1.0,
+      "penalty": -0.01,
+      "distract_reward": 0.0
+    }
+  },
+  "agent_config": {
+    "name": "stream_ac",
+    "device": "cpu",
+    "embed_dim": 64,
+    "num_envs": 1,
+    "gamma": 0.99,
+    "trace_lambda": 0.9,
+    "actor_lr": 1.0,
+    "critic_lr": 1.0,
+    "actor_kappa": 0.2,
+    "critic_kappa": 0.5,
+    "entropy_coefficient": 0.01,
+    "adaptive": false,
+    "actor_architecture": [
+      {
+        "type": "rnn",
+        "cell": "gru",
+        "features": 64
+      },
+      {
+        "type": "fc",
+        "features": -1
+      }
+    ],
+    "critic_architecture": [
+      {
+        "type": "rnn",
+        "cell": "gru",
+        "features": 64
+      },
+      {
+        "type": "fc",
+        "features": -1
+      }
+    ]
+  },
+  "param_shapes": "StreamACState(step=[], update_step=[], timestep=Timestep(obs=[1, 2], action=[1], reward=[1], done=[1]), env_state=RecordEpisodeStatisticsState(env_state=TMazeState(x=[1], y=[1], goal_y=[1], oracle_visited=[1], time_step=[1]), episode_returns=[1], discounted_episode_returns=[1], episode_discount=[1], episode_lengths=[1], returned_episode_returns=[1], returned_discounted_episode_returns=[1], returned_episode_lengths=[1]), actor_params={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [64], 'kernel': [64, 64]}, 'hr': {'kernel': [64, 64]}, 'hz': {'kernel': [64, 64]}, 'in': {'bias': [64], 'kernel': [64, 64]}, 'ir': {'bias': [64], 'kernel': [64, 64]}, 'iz': {'bias': [64], 'kernel': [64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [4], 'kernel': [64, 4]}}}}}, actor_traces={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [1, 64], 'kernel': [1, 2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'hr': {'kernel': [1, 64, 64]}, 'hz': {'kernel': [1, 64, 64]}, 'in': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'ir': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'iz': {'bias': [1, 64], 'kernel': [1, 64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [1, 4], 'kernel': [1, 64, 4]}}}}}, actor_v={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [1, 64], 'kernel': [1, 2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'hr': {'kernel': [1, 64, 64]}, 'hz': {'kernel': [1, 64, 64]}, 'in': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'ir': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'iz': {'bias': [1, 64], 'kernel': [1, 64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [1, 4], 'kernel': [1, 64, 4]}}}}}, actor_carry=([1, 64], None), critic_params={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [64], 'kernel': [2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [64], 'kernel': [64, 64]}, 'hr': {'kernel': [64, 64]}, 'hz': {'kernel': [64, 64]}, 'in': {'bias': [64], 'kernel': [64, 64]}, 'ir': {'bias': [64], 'kernel': [64, 64]}, 'iz': {'bias': [64], 'kernel': [64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [1], 'kernel': [64, 1]}}}}}, critic_traces={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [1, 64], 'kernel': [1, 2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'hr': {'kernel': [1, 64, 64]}, 'hz': {'kernel': [1, 64, 64]}, 'in': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'ir': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'iz': {'bias': [1, 64], 'kernel': [1, 64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [1, 1], 'kernel': [1, 64, 1]}}}}}, critic_v={'params': {'feature_extractor': {'observation_extractor': {'layers_0': {'bias': [1, 64], 'kernel': [1, 2, 64]}}}, 'torso': {'blocks_0': {'cell': {'hn': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'hr': {'kernel': [1, 64, 64]}, 'hz': {'kernel': [1, 64, 64]}, 'in': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'ir': {'bias': [1, 64], 'kernel': [1, 64, 64]}, 'iz': {'bias': [1, 64], 'kernel': [1, 64, 64]}}}, 'blocks_1': {'Dense_0': {'bias': [1, 1], 'kernel': [1, 64, 1]}}}}}, critic_carry=([1, 64], None))"
+}

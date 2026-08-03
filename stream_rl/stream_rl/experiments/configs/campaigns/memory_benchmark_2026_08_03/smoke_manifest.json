@@ -1,0 +1,50 @@
+[
+  {
+    "key": "passive/L2/ppo_gru/base/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ppo_gru/base/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ppo_gru__base",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ppo_gru/frozen_ssm/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ppo_gru/frozen_ssm/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ppo_gru__frozen_ssm",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_gru_bptt1/base/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_gru_bptt1/base/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_gru_bptt1__base",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_gru_bptt1/frozen_ssm/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_gru_bptt1/frozen_ssm/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_gru_bptt1__frozen_ssm",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_rtu_rtrl_bptt1/base/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_rtu_rtrl_bptt1/base/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_rtu_rtrl_bptt1__base",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_rtu_rtrl_bptt1/frozen_ssm/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_rtu_rtrl_bptt1/frozen_ssm/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_rtu_rtrl_bptt1__frozen_ssm",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_eprop_gru/base/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_eprop_gru/base/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_eprop_gru__base",
+    "total_steps": 1000
+  },
+  {
+    "key": "passive/L2/ac_eprop_gru/frozen_ssm/seed_0",
+    "runner": "/Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/smoke/passive/L2/ac_eprop_gru/frozen_ssm/runner.yaml",
+    "run_dir": "/Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03/memory_benchmark_2026_08_03/smoke__passive__L2__ac_eprop_gru__frozen_ssm",
+    "total_steps": 1000
+  }
+]

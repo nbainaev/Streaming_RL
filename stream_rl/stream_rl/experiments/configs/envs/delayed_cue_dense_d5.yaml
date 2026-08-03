@@ -1,0 +1,6 @@
+namespace: delayed_cue
+env_id: delayed_cue_dense
+kwargs:
+  delay: 5
+  dense_rewards: true
+  correct_reward: 1.0

@@ -1,0 +1,11 @@
+agent_config: ../agents/eprop_stream_ac_pilot_stable.yaml
+env_config: ../envs/tmaze_active.yaml
+scenario_config: null
+experiment_name: pilot_eprop_tmaze_active_stable
+log_root: logs/pilot_validation
+total_timesteps: 20000
+log_every: 4000
+step_chunk: 2000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

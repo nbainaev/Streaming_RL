@@ -1,0 +1,40 @@
+name: ppo
+embed_dim: 64
+num_envs: 1
+num_steps: 128
+gamma: 0.99
+gae_lambda: 0.95
+num_minibatches: 1
+update_epochs: 4
+normalize_advantage: true
+clip_coefficient: 0.2
+clip_value_loss: true
+entropy_coefficient: 0.01
+actor_lr: 7.0e-4
+critic_lr: 7.0e-4
+max_grad_norm: 0.5
+device: cpu
+
+actor_architecture:
+  # - type: fc
+  #   features: 64
+  #   activation: tanh
+  - type: rnn
+    cell: gru
+    features: 64
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  # - type: fc
+  #   features: 64
+  #   activation: tanh
+  - type: rnn
+    cell: gru
+    features: 64
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse

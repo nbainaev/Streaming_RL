@@ -1,0 +1,20 @@
+type: event
+events:
+  - at_step: 5000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 3
+  - at_step: 10000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 5
+  - at_step: 20000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length: 10

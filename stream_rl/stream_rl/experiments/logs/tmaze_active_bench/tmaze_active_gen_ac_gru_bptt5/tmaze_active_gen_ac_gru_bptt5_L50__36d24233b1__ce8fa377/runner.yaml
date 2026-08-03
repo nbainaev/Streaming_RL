@@ -1,0 +1,13 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_active_generalization_bench/tmaze_active_gen_ac_gru_bptt5/tmaze_active_gen_ac_gru_bptt5_L50__36d24233b1__ce8fa377/agent.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/.exp_runner_active_generalization_bench/tmaze_active_gen_ac_gru_bptt5/tmaze_active_gen_ac_gru_bptt5_L50__36d24233b1__ce8fa377/env.yaml
+scenario_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/scenario/tmaze_active_generalization_L50.yaml
+experiment_name: tmaze_active_gen_ac_gru_bptt5
+log_root: logs/tmaze_active_bench
+total_timesteps: 184000
+log_every: 1000
+step_chunk: 1000
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1
+variant_name: tmaze_active_gen_ac_gru_bptt5_L50
+run_id: tmaze_active_gen_ac_gru_bptt5_L50__36d24233b1__ce8fa377

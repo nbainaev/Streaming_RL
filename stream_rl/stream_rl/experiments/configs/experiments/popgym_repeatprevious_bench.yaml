@@ -1,0 +1,111 @@
+# Benchmark sweep: all recurrent-core variants on popgym-RepeatPrevious across
+# its Easy/Medium/Hard difficulty variants. Run with:
+#   uv run runners/runner.py --meta-config ../experiments/popgym_repeatprevious_bench.yaml
+#
+# Mirrors tmaze_active_bench.yaml's structure/gamma-defaults but grids over
+# env.env_id (difficulty) instead of corridor_length.
+#
+# trace_lambda=0.97 (up from the shared agent default of 0.9): RepeatPrevious
+# scales its recall lag k with difficulty -- k=4 (Easy), k=32 (Medium), k=64
+# (Hard) -- i.e. the agent must still be carrying a card seen k steps ago.
+# At the old gamma*lambda=0.891, the trace used to train *how* that card
+# gets written into the recurrent state has decayed to ~0.891^32=0.026 by
+# the time the matching reward arrives for Medium, and ~0.891^64=0.0007 for
+# Hard -- both are consistent with Medium/Hard showing zero learning across
+# every architecture in the original benchmark run while Easy (k=4) did
+# learn for several models. gamma*lambda=0.9603 keeps ~0.9603^32=0.28 and
+# ~0.9603^64=0.079 of the signal at those lags respectively.
+max_parallel: 1
+schedule: parallel
+work_dir: .exp_runner_popgym_repeatprevious_bench
+
+experiments:
+  - name: popgym_repeatprevious_ppo_gru
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ppo_gru.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ppo_gru
+      env.namespace: popgym
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_gru_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_gru_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_rtu_bptt1
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt1.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_rtu_bptt1
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_gru_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_gru_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_gru_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_rtu_bptt5
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_bptt5.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_rtu_bptt5
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_rtu_rtrl
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_rtu_rtrl.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_rtu_rtrl
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_eprop_rnn
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_rnn.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_eprop_rnn
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+
+  - name: popgym_repeatprevious_ac_eprop_gru_symmetric
+    command: uv run runners/base_runner.py
+    base_runner_config: ../runner/popgym_base_ac_eprop_gru_symmetric.yaml
+    seeds: [0, 42, 123]
+    overrides:
+      runner.experiment_name: popgym_repeatprevious_ac_eprop_gru_symmetric
+      env.namespace: popgym
+      agent.trace_lambda: 0.97
+      agent.trace_decay: 0.9
+    grid:
+      env.env_id: [popgym-RepeatPreviousEasy, popgym-RepeatPreviousMedium, popgym-RepeatPreviousHard]
+

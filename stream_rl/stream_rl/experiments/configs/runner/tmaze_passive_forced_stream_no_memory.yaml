@@ -1,0 +1,13 @@
+agent_config: ../agents/stream_ac_no_memory_readout.yaml
+env_config: ../envs/tmaze_passive_forced.yaml
+scenario_config: null
+
+experiment_name: pretrained_frozen_memory_forced_tmaze
+run_id: stream_no_memory
+log_root: logs/pretrained_frozen_memory_forced_tmaze
+total_timesteps: 10000
+log_every: 1500
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

@@ -1,0 +1,10 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/agents/ppo_gru.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/envs/_diag_autoencode_easy.yaml
+experiment_name: _diag_ppo_autoencode_long
+log_root: logs/_diag_check
+total_timesteps: 500000
+log_every: 10000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

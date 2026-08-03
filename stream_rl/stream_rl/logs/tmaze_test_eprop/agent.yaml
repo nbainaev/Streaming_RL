@@ -1,0 +1,31 @@
+name: stream_eprop
+device: cpu
+
+num_envs: 1
+embed_dim: 64
+hidden_size: 64
+cell: eprop_gru          # eprop_rnn | eprop_gru | eprop_lstm
+activation: tanh
+
+gamma: 0.99
+trace_decay: 0.9         # e-prop cell's own eligibility trace decay
+trace_lambda: 0.9        # outer streaming (TD-lambda-style) trace, as in stream_ac
+
+# Matched to stream_ac_gru.yaml's (empirically verified) hyperparameters —
+# feedback_mode=symmetric here is mathematically equivalent to that config's
+# generic GRU cell, so the two should behave nearly identically.
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 0.2
+critic_kappa: 0.5
+
+entropy_coefficient: 0.01
+adaptive: false           # ObGD's Adam-like (v_hat) step-size normalization
+
+# "Connectivity matrix" for the learning signal broadcast into the
+# recurrent layer: symmetric (exact, via the real readout weights) |
+# random (fixed random feedback, Bellec et al.'s random e-prop) |
+# adaptive (random, slowly nudged toward the readout weights).
+feedback_mode: symmetric
+feedback_seed: 0
+feedback_lr: 0.05          # only used when feedback_mode == adaptive

@@ -1,0 +1,32 @@
+name: stream_ac
+device: cpu
+
+embed_dim: 32
+num_envs: 4
+gamma: 0.99
+trace_lambda: 0.9
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 3.0
+critic_kappa: 2.0
+entropy_coefficient: 0.1
+adaptive: false
+tbptt_steps: 1
+
+actor_architecture:
+  - type: rnn
+    cell: gru
+    features: 32
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: rnn
+    cell: gru
+    features: 32
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse

@@ -1,0 +1,28 @@
+# Local experiment artifacts
+/archive/
+/logs/
+/output/
+/plots/
+/stream_rl/logs/
+/stream_rl/stream_rl/experiments/logs/
+/stream_rl/stream_rl/experiments/checkpoints/
+
+# Python caches and tooling
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Environments and local settings
+.venv/
+.env
+.env.*
+!.env.example
+
+# OS and editor files
+.DS_Store
+*.swp
+*.swo

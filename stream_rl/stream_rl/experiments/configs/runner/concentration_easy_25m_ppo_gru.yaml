@@ -1,0 +1,13 @@
+agent_config: ../agents/ppo_gru.yaml
+env_config: ../envs/popgym.yaml
+scenario_config: null
+
+experiment_name: concentration_easy_25m_ppo_gru
+run_id: concentration_easy_25m_ppo_gru
+log_root: /Users/antany/Desktop/RL/results/task5/model_comparison_25m
+total_timesteps: 25000000
+log_every: 50000
+step_chunk: 1024
+checkpoint_every: 250000
+eval_every: -1
+eval_steps: -1

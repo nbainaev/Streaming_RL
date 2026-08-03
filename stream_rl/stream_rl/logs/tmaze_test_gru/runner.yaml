@@ -1,0 +1,9 @@
+agent_config: C:\Users\nikba\.vscode\Projects\streaming_rl\stream_rl\stream_rl\experiments\configs\agents\stream_ac_gru.yaml
+env_config: C:\Users\nikba\.vscode\Projects\streaming_rl\stream_rl\stream_rl\experiments\configs\envs\tmaze_passive_small.yaml
+experiment_name: tmaze_test_gru
+log_root: logs/test_verification
+total_timesteps: 15000
+log_every: 500
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

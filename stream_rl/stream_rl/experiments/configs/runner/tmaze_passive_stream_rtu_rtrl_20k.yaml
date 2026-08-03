@@ -1,0 +1,13 @@
+agent_config: ../agents/stream_ac_rtu_rtrl.yaml
+env_config: ../envs/tmaze_passive.yaml
+scenario_config: null
+
+experiment_name: autoresearch_memory_classic_tmaze
+run_id: stream_rtu_rtrl_20k
+log_root: logs/autoresearch_memory_classic_tmaze
+total_timesteps: 20000
+log_every: 4000
+step_chunk: 1000
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1

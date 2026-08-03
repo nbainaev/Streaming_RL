@@ -1,0 +1,29 @@
+type: event
+events:
+  - at_step: 5000
+    action: freeze_agent
+  - at_step: 5000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length_delta: 1
+  - at_step: 5500
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length_delta: 2
+  - at_step: 6000
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length_delta: 3
+  - at_step: 6500
+    action: change_setup
+    params:
+      env_overrides:
+        kwargs:
+          corridor_length_delta: 4
+  

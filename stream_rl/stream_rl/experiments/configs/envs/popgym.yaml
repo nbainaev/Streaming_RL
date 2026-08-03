@@ -1,0 +1,6 @@
+# Placeholder env_id -- always overridden by the env.env_id grid in the
+# popgym_*_bench.yaml experiment configs. Kept valid on its own so a bare
+# base_runner_config still resolves to a working env.
+namespace: popgym
+env_id: popgym-ConcentrationEasy
+kwargs: {}

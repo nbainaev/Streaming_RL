@@ -1,0 +1,12 @@
+{"seed": 0, "step": 640, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 640, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}
+{"seed": 0, "step": 640, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 640, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "freeze_agent", "params": {}}
+{"seed": 0, "step": 600, "trigger_step": 600, "action": "change_setup", "params": {"env_overrides": {"kwargs": {"corridor_length_delta": 10}}}}

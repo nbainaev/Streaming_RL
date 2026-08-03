@@ -1,0 +1,37 @@
+name: stream_ac
+device: cpu
+
+readout_only: true
+memory_seed: 220512258
+critic_memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+gamma: 0.99
+trace_lambda: 0.9
+actor_lr: 1.0
+critic_lr: 1.0
+actor_kappa: 0.2
+critic_kappa: 0.5
+entropy_coefficient: 0.01
+adaptive: false
+tbptt_steps: 1
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: fc
+    features: -1
+    init: sparse

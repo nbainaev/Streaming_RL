@@ -1,0 +1,10 @@
+agent_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/agents/eprop_stream_ac.yaml
+env_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/envs/tmaze_passive.yaml
+scenario_config: /home/nikita/projects/stream_rl/stream_rl/experiments/configs/scenario/tmaze.yaml
+experiment_name: tmaze_ac_eprop
+log_root: logs/test
+total_timesteps: 6000
+log_every: 500
+checkpoint_every: 3000
+eval_every: -1
+eval_steps: -1

@@ -1,0 +1,12 @@
+agent_config: ../agents/stream_ac_gru_bptt1.yaml
+env_config: ../envs/tmaze_active.yaml
+scenario_config: null
+
+experiment_name: tmaze_active_bench
+log_root: logs/tmaze_active_bench
+total_timesteps: 300000
+log_every: 5000
+step_chunk: 1000
+checkpoint_every: 25000
+eval_every: -1
+eval_steps: -1

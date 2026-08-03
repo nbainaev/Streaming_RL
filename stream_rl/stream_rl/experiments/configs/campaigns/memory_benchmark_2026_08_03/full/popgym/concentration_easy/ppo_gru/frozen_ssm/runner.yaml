@@ -1,0 +1,12 @@
+experiment_name: memory_benchmark_2026_08_03
+run_id: full__popgym__concentration_easy__ppo_gru__frozen_ssm
+agent_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/popgym/concentration_easy/ppo_gru/frozen_ssm/agent.yaml
+env_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/popgym/concentration_easy/ppo_gru/frozen_ssm/env.yaml
+log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03
+total_timesteps: 1000000
+step_chunk: 1000
+log_every: 10000
+checkpoint_every: 100000
+eval_every: -1
+scenario:
+  type: none

@@ -1,0 +1,12 @@
+experiment_name: memory_benchmark_2026_08_03
+run_id: full__active__L10__ac_gru_bptt1__base
+agent_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/active/L10/ac_gru_bptt1/base/agent.yaml
+env_config: /Users/antany/Desktop/RL/RL2/Streaming_RL/stream_rl/stream_rl/experiments/configs/campaigns/memory_benchmark_2026_08_03/full/active/L10/ac_gru_bptt1/base/env.yaml
+log_root: /Users/antany/Desktop/RL/RL2/Streaming_RL/logs/memory_benchmark_2026_08_03
+total_timesteps: 300000
+step_chunk: 5000
+log_every: 5000
+checkpoint_every: 50000
+eval_every: -1
+scenario:
+  type: none

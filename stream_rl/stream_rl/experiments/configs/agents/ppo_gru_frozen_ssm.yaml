@@ -1,0 +1,49 @@
+name: ppo
+device: cpu
+
+# Frozen input projection + pretrained frozen SSM; GRU and readouts learn.
+frozen_encoder: true
+memory_seed: 220512258
+critic_memory_seed: 220512258
+embed_dim: 64
+num_envs: 1
+num_steps: 128
+gamma: 0.99
+gae_lambda: 0.95
+num_minibatches: 1
+update_epochs: 4
+normalize_advantage: true
+clip_coefficient: 0.2
+clip_value_loss: true
+entropy_coefficient: 0.01
+actor_lr: 7.0e-4
+critic_lr: 7.0e-4
+max_grad_norm: 0.5
+
+actor_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: rnn
+    cell: gru
+    features: 64
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse
+
+critic_architecture:
+  - type: frozen_ssm
+    features: 64
+    state_dim: 128
+    concatenate_input: true
+    checkpoint_path: stream_rl/experiments/checkpoints/frozen_ssm_delayed_recall.npz
+  - type: rnn
+    cell: gru
+    features: 64
+  - type: layernorm
+  - type: fc
+    features: -1
+    init: sparse

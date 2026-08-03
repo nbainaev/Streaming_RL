@@ -1,0 +1,39 @@
+work_dir: logs/ctgraph_lifelong_pilot_jobs
+
+experiments:
+  - name: ctgraph_stream_ac_pilot
+    series_name: ctgraph_lifelong_pilot
+    command: python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/ctgraph_lifelong_stream_ac.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.total_timesteps: 100000
+      runner.checkpoint_every: -1
+    grid:
+      env.kwargs.reward_switch_steps: [64, 128, 512]
+      agent.actor_kappa: [1.0, 3.0]
+
+  - name: ctgraph_stream_eprop_pilot
+    series_name: ctgraph_lifelong_pilot
+    command: python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/ctgraph_lifelong_stream_eprop.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.total_timesteps: 100000
+      runner.checkpoint_every: -1
+    grid:
+      env.kwargs.reward_switch_steps: [64, 128, 512]
+      agent.actor_kappa: [0.2, 1.0]
+
+  - name: ctgraph_ppo_pilot
+    series_name: ctgraph_lifelong_pilot
+    command: python -m stream_rl.experiments.runners.base_runner
+    base_runner_config: ../runner/ctgraph_lifelong_ppo.yaml
+    seeds: [0, 1, 2]
+    overrides:
+      runner.total_timesteps: 102400
+      runner.checkpoint_every: -1
+    grid:
+      env.kwargs.reward_switch_steps: [64, 128, 512]
+      agent.actor_lr: [0.0003, 0.001]
+      agent.critic_lr: [0.0003, 0.001]

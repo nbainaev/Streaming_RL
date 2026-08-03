@@ -1,0 +1,8 @@
+namespace: delayed_cue
+env_id: delayed_cue_noisy_dense
+kwargs:
+  delay: 5
+  dense_rewards: true
+  noise_dim: 8
+  noise_std: 0.5
+  correct_reward: 1.0

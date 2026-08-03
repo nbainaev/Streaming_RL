@@ -1,0 +1,13 @@
+agent_config: ../agents/ppo_pretrained_frozen_ssm_aux.yaml
+env_config: ../envs/tmaze_passive.yaml
+scenario_config: null
+
+experiment_name: pretrained_frozen_memory_passive_tmaze
+run_id: ppo_pretrained_frozen_ssm_concat_aux
+log_root: logs/pretrained_frozen_memory_passive_tmaze
+total_timesteps: 20000
+log_every: 3072
+step_chunk: 1024
+checkpoint_every: -1
+eval_every: -1
+eval_steps: -1
